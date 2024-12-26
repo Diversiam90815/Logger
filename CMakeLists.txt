@@ -30,3 +30,53 @@ CPMAddPackage(
 
 set(SOURCE_DIR   ${PROJECT_SOURCE_DIR}/src)
 
+
+set(Logger_Files 
+        ${SOURCE_DIR}/LoggerWrapper.h  ${SOURCE_DIR}/LoggerWrapper.cpp
+)
+
+set(ALL_FILES
+    ${Logger_Files}    
+)
+
+source_group("LoggerWrapper"    FILES ${Logger_Files})
+
+
+# Create the dll target
+add_library(${PROJECT_NAME} SHARED
+    ${ALL_FILES}
+)
+
+target_sources(${PROJECT_NAME} PRIVATE  
+        ${ALL_FILES} 
+)
+
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PROJECT_BINARY_DIR}
+        ${CMAKE_BINARY_DIR}/include/
+        ${ALL_PROJECT_DIRS}
+)
+
+
+## Project compiler options
+target_compile_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Release>:
+                /Oi;
+                /Gy
+        >
+        $<$<CONFIG:Debug>:
+                /Od;
+                /Z7
+        >
+        /sdl
+        /MP
+        /wd4146  # Suppress warning C4146
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
+)
+
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME}
+)
