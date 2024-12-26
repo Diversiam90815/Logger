@@ -2,6 +2,8 @@
 #include <iostream>
 
 #include "LoggerWrapper.h"
+#include "PrintMacros.h"
+
 
 int main()
 {
@@ -9,7 +11,6 @@ int main()
 	auto myLogger = LoggerWrapper()
 						.setName("my_app_logger")
 						.setLogLevel(LoggerWrapper::Level::Debug)
-						.setLogPattern("[%T.%e] [%^%l%$] %v")
 						.addRotatingLog("logs/my_app.log", 1024 * 1024 * 5, 3)
 						.addConsoleOutput()
 						.build();
@@ -20,6 +21,12 @@ int main()
 	myLogger->info("Hello, SPDLog Info!");
 	myLogger->warn("Hello, SPDLog Warning!");
 	myLogger->error("Hello, SPDLog Error!");
+
+	std::string asdf = "asdf";
+	int iw = 1234;
+
+	info_printf(myLogger, "main", "This is a dbgprintf test : int %i", iw);
+
 
 	return 0;
 }

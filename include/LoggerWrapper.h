@@ -14,7 +14,11 @@
 #include <vector>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/base_sink.h>
+#include <spdlog/sinks/dup_filter_sink.h>
 #include <spdlog/logger.h>
+#include <spdlog/fmt/fmt.h>
+
+#include "Formatter.h"
 
 
 class LoggerWrapper
@@ -31,6 +35,17 @@ public:
 		Error,
 		Critical
 	};
+
+
+	std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
+
+
+	void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration);
+	void							dropAllAndCreateDefaultLogger();
+	static std::string						sprintf(const char *format, ...);
+
+
+	void							log(Level level, std::string_view func, std::string_view msg);
 
 
 	LoggerWrapper				   &setName(const std::string &name);

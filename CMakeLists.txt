@@ -28,37 +28,47 @@ CPMAddPackage(
 )
 
 
-set(SOURCE_DIR   ${PROJECT_SOURCE_DIR}/src)
-set(WRAPPER_DIR   ${SOURCE_DIR}/LoggerWrapper)
-set(EXAMPLE_DIR   ${SOURCE_DIR}/Example)
+set(SOURCE_DIR              ${PROJECT_SOURCE_DIR}/src/)
+set(HEADER_DIR              ${PROJECT_SOURCE_DIR}/include/)
+set(EXAMPLE_DIR             ${PROJECT_SOURCE_DIR}/Example/)
 
 
 set(ALL_PROJECT_DIRS
-    ${WRAPPER_DIR}    
+    ${SOURCE_DIR}    
+    ${HEADER_DIR}    
     ${EXAMPLE_DIR}    
 )
 
-set(Logger_Files 
-        ${WRAPPER_DIR}/LoggerWrapper.h  ${WRAPPER_DIR}/LoggerWrapper.cpp
+set(Source_Files 
+        ${SOURCE_DIR}/LoggerWrapper.cpp
+        ${SOURCE_DIR}/PrintMacros.cpp
+        ${SOURCE_DIR}/Formatter.cpp
+)
+
+set(Header_Files 
+        ${HEADER_DIR}/LoggerWrapper.h  
+        ${HEADER_DIR}/PrintMacros.h
+        ${HEADER_DIR}/Formatter.h
 )
 
 set(Example_Files 
         ${EXAMPLE_DIR}/main.cpp
 )
 
+
 set(ALL_FILES
     ${Example_Files}    
-    ${Logger_Files}    
+    ${Source_Files}    
+    ${Header_Files}    
 )
 
-source_group("LoggerWrapper"    FILES ${Logger_Files})
+source_group("Header"           FILES ${Source_Files})
+source_group("Source"           FILES ${Header_Files})
 source_group("Example"          FILES ${Example_Files})
 
 
 # Create the target
-add_executable(${PROJECT_NAME}
-    ${ALL_FILES}
-)
+add_executable(${PROJECT_NAME}    ${ALL_FILES})
 
 target_sources(${PROJECT_NAME} PRIVATE  
         ${ALL_FILES} 
