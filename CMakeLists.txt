@@ -29,21 +29,34 @@ CPMAddPackage(
 
 
 set(SOURCE_DIR   ${PROJECT_SOURCE_DIR}/src)
+set(WRAPPER_DIR   ${SOURCE_DIR}/LoggerWrapper)
+set(EXAMPLE_DIR   ${SOURCE_DIR}/Example)
 
+
+set(ALL_PROJECT_DIRS
+    ${WRAPPER_DIR}    
+    ${EXAMPLE_DIR}    
+)
 
 set(Logger_Files 
-        ${SOURCE_DIR}/LoggerWrapper.h  ${SOURCE_DIR}/LoggerWrapper.cpp
+        ${WRAPPER_DIR}/LoggerWrapper.h  ${WRAPPER_DIR}/LoggerWrapper.cpp
+)
+
+set(Example_Files 
+        ${EXAMPLE_DIR}/main.cpp
 )
 
 set(ALL_FILES
+    ${Example_Files}    
     ${Logger_Files}    
 )
 
 source_group("LoggerWrapper"    FILES ${Logger_Files})
+source_group("Example"          FILES ${Example_Files})
 
 
-# Create the dll target
-add_library(${PROJECT_NAME} SHARED
+# Create the target
+add_executable(${PROJECT_NAME}
     ${ALL_FILES}
 )
 
@@ -55,6 +68,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC
         ${PROJECT_BINARY_DIR}
         ${CMAKE_BINARY_DIR}/include/
+        ${CMAKE_BINARY_DIR}/libs/spdlog/include/
         ${ALL_PROJECT_DIRS}
 )
 
@@ -71,10 +85,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
         >
         /sdl
         /MP
-        /wd4146  # Suppress warning C4146
         ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
 )
+
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
