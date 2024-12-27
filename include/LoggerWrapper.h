@@ -21,6 +21,7 @@
 
 #include "Formatter.h"
 
+
 enum class LogLevel
 {
 	Trace,
@@ -66,9 +67,9 @@ namespace logging
 {
 
 
-void			   addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
 
-void			   addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
+void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
@@ -79,7 +80,6 @@ void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkip
 void							dropAllAndCreateDefaultLogger();
 
 void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
-
 
 
 
@@ -151,8 +151,11 @@ struct FileOptions : Options<FileOptions>
 
 private:
 	std::string filename		= "";
+
 	size_t		maxFileSize		= 0;
+
 	size_t		maxFiles		= 3;
+
 	bool		rotateOnSession = false;
 };
 

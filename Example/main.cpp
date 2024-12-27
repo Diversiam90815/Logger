@@ -15,6 +15,13 @@ static void LoggingMessagesForTest()
 }
 
 
+static void LogErrors()
+{
+	std::string error = "Example of Error!";
+	LOG_ERROR("This is an error message : {}", error);
+}
+
+
 int main()
 {
 	// Configure logging outputs
@@ -29,6 +36,7 @@ int main()
 	LOG_INFO("Hello. This is some integer: {}", someInteger);
 
 	LoggingMessagesForTest();
+	LogErrors();
 
 	return 0;
 }
