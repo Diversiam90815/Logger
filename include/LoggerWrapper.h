@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/base_sink.h>
 #include <spdlog/sinks/dup_filter_sink.h>
@@ -20,52 +21,170 @@
 
 #include "Formatter.h"
 
+enum class LogLevel
+{
+	Trace,
+	Debug,
+	Info,
+	Warn,
+	Error,
+	Critical
+};
 
-class LoggerWrapper
+
+class LoggerRegistry
 {
 public:
-	LoggerWrapper() = default;
-
-	enum class Level
+	static LoggerRegistry &sInstance()
 	{
-		Trace,
-		Debug,
-		Info,
-		Warn,
-		Error,
-		Critical
-	};
+		static LoggerRegistry instance;
+		return instance;
+	}
 
+	std::vector<spdlog::sink_ptr> &sinks()
+	{
+		return mSinks;
+	}
 
-	std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
+	LogLevel &defaultLogLevel()
+	{
+		return mDefaultLogLevel;
+	}
 
-
-	void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration);
-	void							dropAllAndCreateDefaultLogger();
-	static std::string						sprintf(const char *format, ...);
-
-
-	void							log(Level level, std::string_view func, std::string_view msg);
-
-
-	LoggerWrapper				   &setName(const std::string &name);
-
-	LoggerWrapper				   &setLogLevel(Level level);
-
-	LoggerWrapper				   &setLogPattern(const std::string &pattern);
-
-	LoggerWrapper				   &addRotatingLog(const std::string &filename, size_t maxFileSizeBytes, size_t maxFiles);
-
-	LoggerWrapper				   &addConsoleOutput();
-
-	std::shared_ptr<spdlog::logger> build();
+	//std::string &mainModuleName()
+	//{
+	//	return mMainModuleName;
+	//}
 
 private:
-	std::string					  mLoggerName{"default_logger"};
+	LoggerRegistry()												= default;
+	~LoggerRegistry()												= default;
+	LoggerRegistry(const LoggerRegistry &)							= delete;
+	LoggerRegistry				 &operator=(const LoggerRegistry &) = delete;
 
-	std::string					  mPattern{"%+"};
-
-	Level						  mLogLevel{Level::Info};
-
-	std::vector<spdlog::sink_ptr> mSinks; // We'll store the sinks here before creating the logger
+	std::vector<spdlog::sink_ptr> mSinks;
+	LogLevel					  mDefaultLogLevel = {LogLevel::Info};
+	//std::string					  mMainModuleName;
 };
+
+
+namespace logging
+{
+
+
+//inline std::string mainModuleName = "";
+
+
+
+void			   addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
+
+void			   addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
+
+//const std::string &getMainModuleName();
+
+
+std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
+
+
+void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration);
+
+void							dropAllAndCreateDefaultLogger();
+
+static std::string				sprintf(const char *format, ...);
+
+
+void							log(LogLevel lvl, std::string_view module, std::string_view func, std::string_view msg);
+
+void							log_with_loc(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
+
+
+//
+//#define LOGGER_MAIN_MODULE_NAME			   (logging::mainModuleName.empty() ? logging::getMainModuleName() : logging::mainModuleName)
+//
+//#define LOGGER_FUNCTION					   static_cast<const char *>(__FUNCTION__)
+//
+//#define LOGGER_SET_MODULE_NAME(moduleName) logging::mainModuleName = #moduleName
+//
+
+
+template <typename Output>
+struct Options
+{
+public:
+	Output &setLevel(LogLevel level) noexcept
+	{
+		this->level = level;
+		return static_cast<Output &>(*this);
+	}
+
+	Output &setMaxSkipDuration(std::chrono::microseconds maxSkipDuration) noexcept
+	{
+		this->maxSkipDuration = maxSkipDuration;
+		return static_cast<Output &>(*this);
+	}
+
+protected:
+	LogLevel				  level = LogLevel::Info;
+	std::chrono::microseconds maxSkipDuration;
+};
+
+struct ConsoleOptions : Options<ConsoleOptions>
+{
+	ConsoleOptions()							= default;
+	ConsoleOptions(const ConsoleOptions &other) = delete;
+	~ConsoleOptions()
+	{
+		logging::addConsoleOutput(level, maxSkipDuration);
+	}
+};
+
+
+struct FileOptions : Options<FileOptions>
+{
+	FileOptions()						  = default;
+	FileOptions(const FileOptions &other) = delete;
+
+	FileOptions &setFilename(std::string filename)
+	{
+		this->filename = filename;
+		return *this;
+	}
+
+	FileOptions &setMaxFileSize(size_t maxFileSize)
+	{
+		this->maxFileSize = maxFileSize;
+		return *this;
+	}
+
+	FileOptions &setMaxFiles(size_t maxFiles)
+	{
+		this->maxFiles = maxFiles;
+		return *this;
+	}
+
+	FileOptions &setRotateOnSession(bool rotateOnSession)
+	{
+		this->rotateOnSession = rotateOnSession;
+		return *this;
+	}
+
+	~FileOptions()
+	{
+		logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession);
+	}
+
+private:
+	std::string filename		= "";
+	size_t		maxFileSize		= 0;
+	size_t		maxFiles		= 3;
+	bool		rotateOnSession = false;
+};
+
+
+
+ConsoleOptions addConsoleOutput();
+
+FileOptions	   addFileOutput();
+
+
+}; // namespace logging

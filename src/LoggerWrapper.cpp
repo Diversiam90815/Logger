@@ -12,28 +12,71 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <iostream>
 #include <stdarg.h>
 
 namespace
 {
 // Helper function to convert from LoggerBuilder::Level to spdlog::level::level_enum
-spdlog::level::level_enum toSpdLogLevel(LoggerWrapper::Level level)
+spdlog::level::level_enum toSpdLogLevel(LogLevel level)
 {
 	switch (level)
 	{
-	case LoggerWrapper::Level::Trace: return spdlog::level::trace;
-	case LoggerWrapper::Level::Debug: return spdlog::level::debug;
-	case LoggerWrapper::Level::Info: return spdlog::level::info;
-	case LoggerWrapper::Level::Warn: return spdlog::level::warn;
-	case LoggerWrapper::Level::Error: return spdlog::level::err;
-	case LoggerWrapper::Level::Critical: return spdlog::level::critical;
+	case LogLevel::Trace: return spdlog::level::trace;
+	case LogLevel::Debug: return spdlog::level::debug;
+	case LogLevel::Info: return spdlog::level::info;
+	case LogLevel::Warn: return spdlog::level::warn;
+	case LogLevel::Error: return spdlog::level::err;
+	case LogLevel::Critical: return spdlog::level::critical;
 	default: return spdlog::level::info;
 	}
 }
 } // anonymous namespace
 
 
-std::shared_ptr<spdlog::logger> LoggerWrapper::getOrCreateLogger(bool drop)
+namespace logging
+{
+
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration)
+{
+	try
+	{
+		auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		sink->set_level(toSpdLogLevel(level));
+
+		registerSink(sink, maxSkipDuration);
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << "Error creating console output sink " << e.what() << std::endl;
+	}
+}
+
+
+void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession)
+{
+	try
+	{
+		auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(std::move(fileName), maxFileSize, maxFiles, rotateOnSession);
+		sink->set_level(toSpdLogLevel(level));
+
+		registerSink(sink, maxSkipDuration);
+	}
+
+	catch (const std::exception &e)
+	{
+		std::cerr << "Error creating rotating file sink " << e.what() << std::endl;
+	}
+}
+//
+//const std::string &getMainModuleName()
+//{
+//
+//	return LoggerRegistry::sInstance().mainModuleName();
+//}
+
+
+std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
 {
 	if (drop)
 	{
@@ -51,24 +94,28 @@ std::shared_ptr<spdlog::logger> LoggerWrapper::getOrCreateLogger(bool drop)
 		static std::mutex			create_mutex;
 		std::lock_guard<std::mutex> lock(create_mutex);
 
-		auto					   &loggerName = mLoggerName;
+		auto					   &loggerName = "DefaultLogger";
 		logger								   = std::make_shared<spdlog::logger>(loggerName);
 		logger->set_level(spdlog::level::trace);
 		logger->flush_on(spdlog::level::trace);
+
+		spdlog::register_logger(logger);
+		spdlog::set_default_logger(logger);
 	}
 
 	return logger;
 }
 
 
-void LoggerWrapper::registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration)
+void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration)
 {
 	sink->set_formatter(std::make_unique<Formatter>());
 
 	static std::mutex			sink_mutex;
 	std::lock_guard<std::mutex> lock(sink_mutex);
 
-	bool						needReset = mSinks.empty();
+	auto					   &sinks	  = LoggerRegistry::sInstance().sinks();
+	bool						needReset = sinks.empty();
 	if (needReset)
 	{
 		// dropAllAndCreateDefaultLogger();
@@ -78,36 +125,44 @@ void LoggerWrapper::registerSink(spdlog::sink_ptr sink, std::chrono::microsecond
 	{
 		auto dupFilter = std::make_shared<spdlog::sinks::dup_filter_sink_mt>(maxSkipDuration);
 		dupFilter->add_sink(sink);
-		mSinks.push_back(dupFilter);
+		sinks.push_back(dupFilter);
 	}
 	else
 	{
-		mSinks.push_back(sink);
+		sinks.push_back(sink);
 	}
 
 	// set sinks for all loggers
-	spdlog::apply_all([this](std::shared_ptr<spdlog::logger> l) { l->sinks().assign(mSinks.begin(), mSinks.end()); });
+	spdlog::apply_all([sinks](std::shared_ptr<spdlog::logger> l) { l->sinks().assign(sinks.begin(), sinks.end()); });
 }
 
 
-void LoggerWrapper::dropAllAndCreateDefaultLogger()
+void dropAllAndCreateDefaultLogger()
 {
 	getOrCreateLogger(true);
 }
 
 
-void LoggerWrapper::log(Level level, std::string_view func, std::string_view msg)
+void log(LogLevel lvl, std::string_view module, std::string_view func, std::string_view msg)
 {
 	auto			   logger	= getOrCreateLogger();
-	auto			   spdLevel = toSpdLogLevel(level);
+	auto			   spdLevel = toSpdLogLevel(lvl);
 
-	spdlog::source_loc loc{" ", 1, func.data()};
+	spdlog::source_loc loc{__FILE__, __LINE__, func.data()};
+	logger->log(loc, spdLevel, fmt::format("{}", msg));
+}
+
+
+void log_with_loc(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
+{
+	auto logger	  = getOrCreateLogger();
+	auto spdLevel = toSpdLogLevel(level);
 
 	logger->log(loc, spdLevel, msg);
 }
 
 
-std::string LoggerWrapper::sprintf(const char *format, ...)
+std::string sprintf(const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -134,61 +189,17 @@ std::string LoggerWrapper::sprintf(const char *format, ...)
 }
 
 
-LoggerWrapper &LoggerWrapper::setName(const std::string &name)
+
+ConsoleOptions addConsoleOutput()
 {
-	mLoggerName = name;
-	return *this;
+	return {};
 }
 
 
-LoggerWrapper &LoggerWrapper::setLogLevel(Level level)
+FileOptions addFileOutput()
 {
-	mLogLevel = level;
-	return *this;
+	return {};
 }
 
 
-LoggerWrapper &LoggerWrapper::setLogPattern(const std::string &pattern)
-{
-	mPattern = pattern;
-	return *this;
-}
-
-
-LoggerWrapper &LoggerWrapper::addRotatingLog(const std::string &filename, size_t maxFileSizeBytes, size_t maxFiles)
-{
-	auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, // path to the log file
-																	   maxFileSizeBytes, maxFiles
-																	   // optional 4th param: rotate_on_open = false
-	);
-	mSinks.push_back(sink);
-	return *this;
-}
-
-
-LoggerWrapper &LoggerWrapper::addConsoleOutput()
-{
-	auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	mSinks.push_back(sink);
-	return *this;
-}
-
-
-std::shared_ptr<spdlog::logger> LoggerWrapper::build()
-{
-	if (mSinks.empty())
-	{
-		// If the user did not specify a sink, let's at least have a console sink
-		auto defaultSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		mSinks.push_back(defaultSink);
-	}
-
-	// Create logger
-	auto logger = std::make_shared<spdlog::logger>(mLoggerName, mSinks.begin(), mSinks.end());
-
-	// Set pattern and level
-	logger->set_pattern(mPattern);
-	logger->set_level(toSpdLogLevel(mLogLevel));
-
-	return logger;
-}
+} // namespace logging
