@@ -68,12 +68,6 @@ void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, st
 		std::cerr << "Error creating rotating file sink " << e.what() << std::endl;
 	}
 }
-//
-//const std::string &getMainModuleName()
-//{
-//
-//	return LoggerRegistry::sInstance().mainModuleName();
-//}
 
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
@@ -118,7 +112,7 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	bool						needReset = sinks.empty();
 	if (needReset)
 	{
-		// dropAllAndCreateDefaultLogger();
+		 //dropAllAndCreateDefaultLogger();		// Seems to cause DefaultLogger (Logger Name) to appear as a file/modulename
 	}
 
 	if (maxSkipDuration > std::chrono::seconds(0))
@@ -143,49 +137,12 @@ void dropAllAndCreateDefaultLogger()
 }
 
 
-void log(LogLevel lvl, std::string_view module, std::string_view func, std::string_view msg)
-{
-	auto			   logger	= getOrCreateLogger();
-	auto			   spdLevel = toSpdLogLevel(lvl);
-
-	spdlog::source_loc loc{__FILE__, __LINE__, func.data()};
-	logger->log(loc, spdLevel, fmt::format("{}", msg));
-}
-
-
-void log_with_loc(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
+void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 {
 	auto logger	  = getOrCreateLogger();
 	auto spdLevel = toSpdLogLevel(level);
 
 	logger->log(loc, spdLevel, msg);
-}
-
-
-std::string sprintf(const char *format, ...)
-{
-	va_list args;
-	va_start(args, format);
-
-	va_list tmp;
-	va_copy(tmp, args);
-
-	std::string result;
-
-	int			size = vsnprintf(nullptr, 0, format, args);
-	va_end(args);
-
-	va_start(tmp, format);
-
-	if (size > 0)
-	{
-		size_t sz = static_cast<size_t>(size + 1);
-		result.resize(sz + 1);
-		vsnprintf(result.data(), sz, format, tmp);
-	}
-
-	va_end(tmp);
-	return result;
 }
 
 

@@ -2,9 +2,9 @@
 #pragma once
 
 #include <spdlog/formatter.h>
-#include <spdlog/pattern_formatter.h>
-#include <spdlog/fmt/bundled/format.h>
-#include <spdlog/details/os.h>
+//#include <spdlog/pattern_formatter.h>
+//#include <spdlog/fmt/bundled/format.h>
+//#include <spdlog/details/os.h>
 #include <spdlog/details/log_msg.h>
 
 
@@ -50,21 +50,17 @@ private:
 	static std::string get_basename_no_ext(const char *fullpath)
 	{
 		if (!fullpath || !*fullpath)
-			return "UnknownFile";
+			return "Unknown File";
 
-		// 1) Strip the directory (e.g. "F:\SoftwareProjects\Logger\Example\main.cpp" -> "main.cpp")
 		std::string_view sv(fullpath);
 		size_t			 lastSlash = sv.find_last_of("/\\");
 		if (lastSlash != std::string_view::npos)
 			sv.remove_prefix(lastSlash + 1);
 
-		// Now sv is "main.cpp"
-		// 2) Remove extension (".cpp" in this case)
 		size_t dotPos = sv.rfind('.');
 		if (dotPos != std::string_view::npos)
 			sv.remove_suffix(sv.size() - dotPos);
 
-		// Now sv is just "main"
 		return std::string(sv);
 	}
 

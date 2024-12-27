@@ -51,11 +51,6 @@ public:
 		return mDefaultLogLevel;
 	}
 
-	//std::string &mainModuleName()
-	//{
-	//	return mMainModuleName;
-	//}
-
 private:
 	LoggerRegistry()												= default;
 	~LoggerRegistry()												= default;
@@ -64,7 +59,6 @@ private:
 
 	std::vector<spdlog::sink_ptr> mSinks;
 	LogLevel					  mDefaultLogLevel = {LogLevel::Info};
-	//std::string					  mMainModuleName;
 };
 
 
@@ -72,15 +66,9 @@ namespace logging
 {
 
 
-//inline std::string mainModuleName = "";
-
-
-
 void			   addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
 
 void			   addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
-
-//const std::string &getMainModuleName();
 
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
@@ -90,21 +78,9 @@ void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkip
 
 void							dropAllAndCreateDefaultLogger();
 
-static std::string				sprintf(const char *format, ...);
+void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
 
 
-void							log(LogLevel lvl, std::string_view module, std::string_view func, std::string_view msg);
-
-void							log_with_loc(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
-
-
-//
-//#define LOGGER_MAIN_MODULE_NAME			   (logging::mainModuleName.empty() ? logging::getMainModuleName() : logging::mainModuleName)
-//
-//#define LOGGER_FUNCTION					   static_cast<const char *>(__FUNCTION__)
-//
-//#define LOGGER_SET_MODULE_NAME(moduleName) logging::mainModuleName = #moduleName
-//
 
 
 template <typename Output>
