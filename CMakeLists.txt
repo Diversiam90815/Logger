@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(Logger LANGUAGES CXX)
+set(LOGGER_VERSION 1.0.0)
+
+project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR})
 
@@ -40,7 +42,6 @@ set(ALL_PROJECT_DIRS
 
 set(Source_Files 
         ${SOURCE_DIR}/LoggerWrapper.cpp
-        ${SOURCE_DIR}/PrintMacros.cpp
         ${SOURCE_DIR}/Formatter.cpp
 )
 
