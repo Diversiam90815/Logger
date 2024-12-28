@@ -28,8 +28,7 @@ A simple C++ logging setup that builds on [spdlog](https://github.com/gabime/spd
 In your code:
 
 ```cpp
-#include "LoggerWrapper.h"
-#include "PrintMacros.h"
+#include "Logger.h"
 
 int main()
 {
