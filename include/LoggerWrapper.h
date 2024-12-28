@@ -63,9 +63,23 @@ private:
 };
 
 
+namespace filesize
+{
+inline constexpr unsigned long long operator""_KB(unsigned long long value)
+{
+	return value * 1'024;
+}
+
+inline constexpr unsigned long long operator""_MB(unsigned long long value)
+{
+	return value * 1'024 * 1_KB;
+}
+} // namespace filesize
+
+using namespace filesize;
+
 namespace logging
 {
-
 
 void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
 
@@ -152,7 +166,7 @@ struct FileOptions : Options<FileOptions>
 private:
 	std::string filename		= "";
 
-	size_t		maxFileSize		= 0;
+	size_t		maxFileSize		= 10_MB;
 
 	size_t		maxFiles		= 3;
 

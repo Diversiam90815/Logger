@@ -24,8 +24,10 @@ static void LogErrors()
 
 int main()
 {
+	using namespace filesize;
+
 	// Configure logging outputs
-	logging::addFileOutput().setFilename("TestLog.log").setLevel(LogLevel::Info).setMaxFileSize(200 * 1024 /* e.g. 200 KB */).setRotateOnSession(true);
+	logging::addFileOutput().setFilename("TestLog.log").setLevel(LogLevel::Info).setMaxFileSize(20_MB).setRotateOnSession(true);
 
 	// Maybe also add console output at a different level
 	logging::addConsoleOutput().setLevel(LogLevel::Debug);
