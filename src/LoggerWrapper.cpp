@@ -89,11 +89,6 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	std::lock_guard<std::mutex> lock(sink_mutex);
 
 	auto					   &sinks	  = LoggerRegistry::sInstance().sinks();
-	bool						needReset = sinks.empty();
-	if (needReset)
-	{
-		// dropAllAndCreateDefaultLogger();		// Seems to cause DefaultLogger (Logger Name) to appear as a file/modulename
-	}
 
 	if (maxSkipDuration > std::chrono::seconds(0))
 	{
