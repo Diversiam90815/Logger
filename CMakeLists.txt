@@ -8,7 +8,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 ## Setting the lib directory for project included packages
 set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
@@ -17,7 +16,7 @@ include(cmake/cpm.cmake)
 
 
 #----------------------------
-# Juce API
+# SPDLOG
 #----------------------------
 
 CPMAddPackage(
@@ -46,15 +45,17 @@ set(Source_Files
 )
 
 set(Header_Files 
+        ${HEADER_DIR}/Logger.h  
         ${HEADER_DIR}/LoggerWrapper.h  
         ${HEADER_DIR}/PrintMacros.h
         ${HEADER_DIR}/Formatter.h
+        ${HEADER_DIR}/Helper.h
+        ${HEADER_DIR}/LoggerRegistry.h
 )
 
 set(Example_Files 
         ${EXAMPLE_DIR}/main.cpp
 )
-
 
 set(ALL_FILES
     ${Example_Files}    
@@ -62,13 +63,15 @@ set(ALL_FILES
     ${Header_Files}    
 )
 
-source_group("Header"           FILES ${Source_Files})
-source_group("Source"           FILES ${Header_Files})
+
+source_group("Source"           FILES ${Source_Files})
+source_group("Header"           FILES ${Header_Files})
 source_group("Example"          FILES ${Example_Files})
 
 
 # Create the target
 add_executable(${PROJECT_NAME}    ${ALL_FILES})
+
 
 target_sources(${PROJECT_NAME} PRIVATE  
         ${ALL_FILES} 

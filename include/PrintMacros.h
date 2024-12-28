@@ -1,52 +1,22 @@
+/*
+  ==============================================================================
+
+	Module			PrintMacros
+	Description		Definitions of print macros to be used in projects
+
+  ==============================================================================
+*/
 
 #pragma once
 
 #include "LoggerWrapper.h"
 
+#define LOG(level, fmtStr, ...) logging::log(LogLevel::level, spdlog::source_loc{__FILE__, __LINE__, __FUNCTION__}, fmt::format(fmtStr, ##__VA_ARGS__))
 
-#define LOG_TRACE(fmtStr, ...)                                                  \
-	do                                                                          \
-	{                                                                           \
-		spdlog::source_loc loc{__FILE__, __LINE__, __FUNCTION__};               \
-		logging::log(LogLevel::Trace, loc, fmt::format(fmtStr, ##__VA_ARGS__)); \
-	} while (0)
+#define LOG_TRACE(fmtStr, ...)		LOG(Trace, fmtStr, ##__VA_ARGS__)
+#define LOG_DEBUG(fmtStr, ...)		LOG(Debug, fmtStr, ##__VA_ARGS__)
+#define LOG_INFO(fmtStr, ...)		LOG(Info, fmtStr, ##__VA_ARGS__)
+#define LOG_WARNING(fmtStr, ...)	LOG(Warn, fmtStr, ##__VA_ARGS__)
+#define LOG_ERROR(fmtStr, ...)		LOG(Error, fmtStr, ##__VA_ARGS__)
+#define LOG_CRITICAL(fmtStr, ...)	LOG(Critical, fmtStr, ##__VA_ARGS__)
 
-
-#define LOG_DEBUG(fmtStr, ...)                                                  \
-	do                                                                          \
-	{                                                                           \
-		spdlog::source_loc loc{__FILE__, __LINE__, __FUNCTION__};               \
-		logging::log(LogLevel::Debug, loc, fmt::format(fmtStr, ##__VA_ARGS__)); \
-	} while (0)
-
-
-#define LOG_INFO(fmtStr, ...)                                                  \
-	do                                                                         \
-	{                                                                          \
-		spdlog::source_loc loc{__FILE__, __LINE__, __FUNCTION__};              \
-		logging::log(LogLevel::Info, loc, fmt::format(fmtStr, ##__VA_ARGS__)); \
-	} while (0)
-
-
-#define LOG_WARNING(fmtStr, ...)                                               \
-	do                                                                         \
-	{                                                                          \
-		spdlog::source_loc loc{__FILE__, __LINE__, __FUNCTION__};              \
-		logging::log(LogLevel::Warn, loc, fmt::format(fmtStr, ##__VA_ARGS__)); \
-	} while (0)
-
-
-#define LOG_ERROR(fmtStr, ...)                                                  \
-	do                                                                          \
-	{                                                                           \
-		spdlog::source_loc loc{__FILE__, __LINE__, __FUNCTION__};               \
-		logging::log(LogLevel::Error, loc, fmt::format(fmtStr, ##__VA_ARGS__)); \
-	} while (0)
-
-
-#define LOG_CRITICAL(fmtStr, ...)                                                  \
-	do                                                                             \
-	{                                                                              \
-		spdlog::source_loc loc{__FILE__, __LINE__, __FUNCTION__};                  \
-		logging::log(LogLevel::Critical, loc, fmt::format(fmtStr, ##__VA_ARGS__)); \
-	} while (0)

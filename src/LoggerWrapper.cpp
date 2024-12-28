@@ -7,31 +7,11 @@
   ==============================================================================
 */
 
-#include "LoggerWrapper.h"
-
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-
 #include <iostream>
-#include <stdarg.h>
 
-namespace
-{
-// Helper function to convert from LoggerBuilder::Level to spdlog::level::level_enum
-spdlog::level::level_enum toSpdLogLevel(LogLevel level)
-{
-	switch (level)
-	{
-	case LogLevel::Trace: return spdlog::level::trace;
-	case LogLevel::Debug: return spdlog::level::debug;
-	case LogLevel::Info: return spdlog::level::info;
-	case LogLevel::Warn: return spdlog::level::warn;
-	case LogLevel::Error: return spdlog::level::err;
-	case LogLevel::Critical: return spdlog::level::critical;
-	default: return spdlog::level::info;
-	}
-}
-} // anonymous namespace
+#include "LoggerWrapper.h"
 
 
 namespace logging
@@ -112,7 +92,7 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	bool						needReset = sinks.empty();
 	if (needReset)
 	{
-		 //dropAllAndCreateDefaultLogger();		// Seems to cause DefaultLogger (Logger Name) to appear as a file/modulename
+		// dropAllAndCreateDefaultLogger();		// Seems to cause DefaultLogger (Logger Name) to appear as a file/modulename
 	}
 
 	if (maxSkipDuration > std::chrono::seconds(0))
@@ -146,6 +126,35 @@ void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 }
 
 
+// Options:
+
+// File Options:
+
+FileOptions &FileOptions::setFilename(std::string filename)
+{
+	this->filename = filename;
+	return *this;
+}
+
+FileOptions &FileOptions::setMaxFileSize(size_t maxFileSize)
+{
+	this->maxFileSize = maxFileSize;
+	return *this;
+}
+
+FileOptions &FileOptions::setMaxFiles(size_t maxFiles)
+{
+	this->maxFiles = maxFiles;
+	return *this;
+}
+
+FileOptions &FileOptions::setRotateOnSession(bool rotateOnSession)
+{
+	this->rotateOnSession = rotateOnSession;
+	return *this;
+}
+
+
 
 ConsoleOptions addConsoleOutput()
 {
@@ -157,6 +166,5 @@ FileOptions addFileOutput()
 {
 	return {};
 }
-
 
 } // namespace logging

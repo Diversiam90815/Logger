@@ -9,85 +9,20 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/base_sink.h>
-#include <spdlog/sinks/dup_filter_sink.h>
-#include <spdlog/logger.h>
-#include <spdlog/fmt/fmt.h>
-
 #include "Formatter.h"
-
-
-enum class LogLevel
-{
-	Trace,
-	Debug,
-	Info,
-	Warn,
-	Error,
-	Critical
-};
-
-
-class LoggerRegistry
-{
-public:
-	static LoggerRegistry &sInstance()
-	{
-		static LoggerRegistry instance;
-		return instance;
-	}
-
-	std::vector<spdlog::sink_ptr> &sinks()
-	{
-		return mSinks;
-	}
-
-	LogLevel &defaultLogLevel()
-	{
-		return mDefaultLogLevel;
-	}
-
-private:
-	LoggerRegistry()												= default;
-	~LoggerRegistry()												= default;
-	LoggerRegistry(const LoggerRegistry &)							= delete;
-	LoggerRegistry				 &operator=(const LoggerRegistry &) = delete;
-
-	std::vector<spdlog::sink_ptr> mSinks;
-	LogLevel					  mDefaultLogLevel = {LogLevel::Info};
-};
-
-
-namespace filesize
-{
-inline constexpr unsigned long long operator""_KB(unsigned long long value)
-{
-	return value * 1'024;
-}
-
-inline constexpr unsigned long long operator""_MB(unsigned long long value)
-{
-	return value * 1'024 * 1_KB;
-}
-} // namespace filesize
+#include "Helper.h"
+#include "LoggerRegistry.h"
 
 using namespace filesize;
 
+
 namespace logging
 {
-
 void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
 
 void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 
-
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
-
 
 void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration);
 
@@ -96,7 +31,9 @@ void							dropAllAndCreateDefaultLogger();
 void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
 
 
-
+/*
+ *	@brief		Options for specifying custom sink's features
+ */
 template <typename Output>
 struct Options
 {
@@ -118,6 +55,10 @@ protected:
 	std::chrono::microseconds maxSkipDuration;
 };
 
+
+/*
+ *	@brief		Options to create a console output sink
+ */
 struct ConsoleOptions : Options<ConsoleOptions>
 {
 	ConsoleOptions()							= default;
@@ -129,55 +70,33 @@ struct ConsoleOptions : Options<ConsoleOptions>
 };
 
 
+/*
+ *	@brief		Options to create a file output sink
+ */
 struct FileOptions : Options<FileOptions>
 {
 	FileOptions()						  = default;
 	FileOptions(const FileOptions &other) = delete;
-
-	FileOptions &setFilename(std::string filename)
-	{
-		this->filename = filename;
-		return *this;
-	}
-
-	FileOptions &setMaxFileSize(size_t maxFileSize)
-	{
-		this->maxFileSize = maxFileSize;
-		return *this;
-	}
-
-	FileOptions &setMaxFiles(size_t maxFiles)
-	{
-		this->maxFiles = maxFiles;
-		return *this;
-	}
-
-	FileOptions &setRotateOnSession(bool rotateOnSession)
-	{
-		this->rotateOnSession = rotateOnSession;
-		return *this;
-	}
-
 	~FileOptions()
 	{
 		logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession);
 	}
 
+	FileOptions &setFilename		(std::string filename);
+	FileOptions &setMaxFileSize		(size_t maxFileSize);
+	FileOptions &setMaxFiles		(size_t maxFiles);
+	FileOptions &setRotateOnSession	(bool rotateOnSession);
+
 private:
 	std::string filename		= "";
-
 	size_t		maxFileSize		= 10_MB;
-
 	size_t		maxFiles		= 3;
-
 	bool		rotateOnSession = false;
 };
-
 
 
 ConsoleOptions addConsoleOutput();
 
 FileOptions	   addFileOutput();
-
 
 }; // namespace logging
