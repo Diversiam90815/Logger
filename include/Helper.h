@@ -46,7 +46,7 @@ spdlog::level::level_enum toSpdLogLevel(LogLevel level)
 	case LogLevel::Warn: return spdlog::level::warn;
 	case LogLevel::Error: return spdlog::level::err;
 	case LogLevel::Critical: return spdlog::level::critical;
-	default: return spdlog::level::info;
+	default: return spdlog::level::off;
 	}
 }
 } // anonymous namespace
