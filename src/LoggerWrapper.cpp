@@ -9,6 +9,7 @@
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/msvc_sink.h>
 #include <iostream>
 
 #include "LoggerWrapper.h"
@@ -50,6 +51,17 @@ void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, st
 }
 
 
+void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::microseconds maxSkipDuration)
+{
+#ifdef _WIN32
+	auto sink = std::make_shared<spdlog::sinks::msvc_sink_mt>(checkForDebuggerPresent);
+	sink->set_level(toSpdLogLevel(level));
+
+	registerSink(sink, maxSkipDuration);
+#endif // _WIN32
+}
+
+
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
 {
 	if (drop)
@@ -88,7 +100,7 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	static std::mutex			sink_mutex;
 	std::lock_guard<std::mutex> lock(sink_mutex);
 
-	auto					   &sinks	  = LoggerRegistry::sInstance().sinks();
+	auto					   &sinks = LoggerRegistry::sInstance().sinks();
 
 	if (maxSkipDuration > std::chrono::seconds(0))
 	{
@@ -149,6 +161,14 @@ FileOptions &FileOptions::setRotateOnSession(bool rotateOnSession)
 	return *this;
 }
 
+// MSVC Options:
+
+MSVCOptions &MSVCOptions::checkForPresentDebugger(bool check)
+{
+	this->checkForDebugger = check;
+	return *this;
+}
+
 
 
 ConsoleOptions addConsoleOutput()
@@ -156,10 +176,15 @@ ConsoleOptions addConsoleOutput()
 	return {};
 }
 
-
 FileOptions addFileOutput()
 {
 	return {};
 }
+
+MSVCOptions addMSVCOutput()
+{
+	return {};
+}
+
 
 } // namespace logging

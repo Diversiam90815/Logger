@@ -22,6 +22,9 @@ void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration)
 
 void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 
+void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::microseconds maxSkipDuration);
+
+
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
 
 void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration);
@@ -82,10 +85,10 @@ struct FileOptions : Options<FileOptions>
 		logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession);
 	}
 
-	FileOptions &setFilename		(std::string filename);
-	FileOptions &setMaxFileSize		(size_t maxFileSize);
-	FileOptions &setMaxFiles		(size_t maxFiles);
-	FileOptions &setRotateOnSession	(bool rotateOnSession);
+	FileOptions &setFilename(std::string filename);
+	FileOptions &setMaxFileSize(size_t maxFileSize);
+	FileOptions &setMaxFiles(size_t maxFiles);
+	FileOptions &setRotateOnSession(bool rotateOnSession);
 
 private:
 	std::string filename		= "";
@@ -95,8 +98,30 @@ private:
 };
 
 
+/*
+ *	@brief		Options to create a MSVC output sink
+ */
+struct MSVCOptions : Options<MSVCOptions>
+{
+public:
+	MSVCOptions()						  = default;
+	MSVCOptions(const MSVCOptions &other) = delete;
+	~MSVCOptions()
+	{
+		logging::addMSVCOutput(level, checkForDebugger, maxSkipDuration);
+	}
+
+	MSVCOptions &checkForPresentDebugger(bool check);
+
+private:
+	bool checkForDebugger = false;
+};
+
+
 ConsoleOptions addConsoleOutput();
 
 FileOptions	   addFileOutput();
+
+MSVCOptions	   addMSVCOutput();
 
 }; // namespace logging
