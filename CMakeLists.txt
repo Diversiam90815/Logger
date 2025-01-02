@@ -27,9 +27,9 @@ CPMAddPackage(
     SOURCE_DIR ${LIB_DIR}/spdlog
 )
 
-set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/src/)
-set(HEADER_DIR ${PROJECT_SOURCE_DIR}/include/)
-set(EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/Example/)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+set(EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Example/)
 
 set(Source_Files 
     ${SOURCE_DIR}/LoggerWrapper.cpp
