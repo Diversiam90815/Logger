@@ -50,11 +50,6 @@ set(Example_Files
 )
 
 # Create the library
-add_library(Logger STATIC ${Source_Files} ${Header_Files})
-target_link_libraries(Logger PUBLIC spdlog::spdlog)
-target_include_directories(Logger PUBLIC ${HEADER_DIR})
-
-# Create the example executable
-add_executable(LoggerExecutable ${Example_Files})
-target_link_libraries(LoggerExecutable PRIVATE Logger)
-target_include_directories(LoggerExecutable PRIVATE ${HEADER_DIR})
+add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
