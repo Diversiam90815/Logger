@@ -80,7 +80,7 @@ std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
 		static std::mutex			create_mutex;
 		std::lock_guard<std::mutex> lock(create_mutex);
 
-		auto					   &loggerName = "DefaultLogger";
+		const std::string					   &loggerName = logging::getLoggerName().empty() ? "DefaultLogger" : logging::getLoggerName();
 		logger								   = std::make_shared<spdlog::logger>(loggerName);
 		logger->set_level(spdlog::level::trace);
 		logger->flush_on(spdlog::level::trace);
@@ -118,12 +118,6 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 }
 
 
-void dropAllAndCreateDefaultLogger()
-{
-	getOrCreateLogger(true);
-}
-
-
 void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 {
 	auto logger	  = getOrCreateLogger();
@@ -131,6 +125,19 @@ void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 
 	logger->log(loc, spdLevel, msg);
 }
+
+
+void setLoggerName(std::string &name)
+{
+	LoggerRegistry::sInstance().setLoggerName(name);
+}
+
+
+std::string getLoggerName()
+{
+	return LoggerRegistry::sInstance().getLoggerName();
+}
+
 
 
 // Options:

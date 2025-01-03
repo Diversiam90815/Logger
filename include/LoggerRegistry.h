@@ -30,20 +30,37 @@ public:
 		return instance;
 	}
 
-	std::vector<spdlog::sink_ptr> &sinks()	{return mSinks;}
+	std::vector<spdlog::sink_ptr> &sinks()
+	{
+		return mSinks;
+	}
 
-	LogLevel &defaultLogLevel()	{return mDefaultLogLevel;}
+	LogLevel &defaultLogLevel()
+	{
+		return mDefaultLogLevel;
+	}
+
+	void setLoggerName(std::string &name)
+	{
+		mLoggerName = name;
+	}
+	std::string getLoggerName()
+	{
+		return mLoggerName;
+	}
 
 private:
 	LoggerRegistry()												= default;
 
 	~LoggerRegistry()												= default;
-	
+
 	LoggerRegistry(const LoggerRegistry &)							= delete;
-	
+
 	LoggerRegistry				 &operator=(const LoggerRegistry &) = delete;
 
 	std::vector<spdlog::sink_ptr> mSinks;
 
 	LogLevel					  mDefaultLogLevel = {LogLevel::Info};
+
+	std::string					  mLoggerName	   = "";
 };
