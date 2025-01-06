@@ -105,6 +105,7 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	if (maxSkipDuration > std::chrono::seconds(0))
 	{
 		auto dupFilter = std::make_shared<spdlog::sinks::dup_filter_sink_mt>(maxSkipDuration);
+		dupFilter->setLevel(level);
 		dupFilter->add_sink(sink);
 		sinks.push_back(dupFilter);
 	}
