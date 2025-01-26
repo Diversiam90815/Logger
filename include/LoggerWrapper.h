@@ -67,10 +67,7 @@ struct ConsoleOptions : Options<ConsoleOptions>
 {
 	ConsoleOptions()							= default;
 	ConsoleOptions(const ConsoleOptions &other) = delete;
-	~ConsoleOptions()
-	{
-		logging::addConsoleOutput(level, maxSkipDuration);
-	}
+	~ConsoleOptions() { logging::addConsoleOutput(level, maxSkipDuration); }
 };
 
 
@@ -81,10 +78,7 @@ struct FileOptions : Options<FileOptions>
 {
 	FileOptions()						  = default;
 	FileOptions(const FileOptions &other) = delete;
-	~FileOptions()
-	{
-		logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession);
-	}
+	~FileOptions() { logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession); }
 
 	FileOptions &setFilename(std::string filename);
 	FileOptions &setMaxFileSize(size_t maxFileSize);
@@ -107,10 +101,7 @@ struct MSVCOptions : Options<MSVCOptions>
 public:
 	MSVCOptions()						  = default;
 	MSVCOptions(const MSVCOptions &other) = delete;
-	~MSVCOptions()
-	{
-		logging::addMSVCOutput(level, checkForDebugger, maxSkipDuration);
-	}
+	~MSVCOptions() { logging::addMSVCOutput(level, checkForDebugger, maxSkipDuration); }
 
 	MSVCOptions &checkForPresentDebugger(bool check);
 

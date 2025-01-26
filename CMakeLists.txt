@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.1.34)
+set(LOGGER_VERSION 1.1.37)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
@@ -25,13 +25,7 @@ CPMAddPackage(
     GITHUB_REPOSITORY gabime/spdlog
     VERSION 1.15.0
     SOURCE_DIR ${LIB_DIR}/spdlog
-    OPTIONS
-        "SPDLOG_BUILD_EXAMPLES:BOOL=OFF"
-        "SPDLOG_BUILD_TESTS:BOOL=OFF"
-        "SPDLOG_BUILD_BENCH:BOOL=OFF"
-        "SPDLOG_INSTALL:BOOL=OFF"
 )
-set_property(TARGET spdlog PROPERTY EXCLUDE_FROM_ALL TRUE)
 
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
@@ -57,5 +51,7 @@ set(Example_Files
 
 # Create the library
 add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
+
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
