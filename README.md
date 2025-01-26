@@ -8,24 +8,28 @@ A simple C++ logging setup that builds on [spdlog](https://github.com/gabime/spd
 - Log macros (`LOG_INFO`, `LOG_ERROR`, etc.) with `fmt` formatting.
 - Simple [CMake](https://cmake.org/) build and example usage.
 
-## Quick Start
-
-1. **Clone or download** this repository.
-2. **Build** with [Python 3](https://www.python.org/) and CMake:
-   ```bash
-   python build.py --prepare   # Generates CMake build files
-   python build.py --build     # Builds the project
-   ```
-   Alternatively, run CMake manually:
-   ```bash
-   cmake -B build
-   cmake --build build --config Release
-   ```
-3. **Run** the generated `Logger.exe` (on Windows) or `Logger` (on other platforms) in the `build` directory.
 
 ## Usage Example
 
-In your code:
+### In your CMakeLists.txt:
+#### Add Logger to Your Project
+You can include this Logger project as a subdirectory in your own CMake project. For example, if you clone or include it as a git submodule under submodules/Logger, you can do:
+
+#### In your top-level CMakeLists.txt
+```cmake
+add_subdirectory(submodules/Logger)
+```
+
+#### Link Logger to Your Executable/Library
+Next, link the Logger library to your target. For instance:
+
+```cmake
+target_link_libraries(MyApp PRIVATE Logger)
+```
+
+Because the Logger uses a PUBLIC include for its headers, you do not need extra include_directories for the Logger — they are automatically made available to your target.
+
+### In your code:
 
 ```cpp
 #include "Logger.h"
