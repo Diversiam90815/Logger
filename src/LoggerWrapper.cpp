@@ -68,40 +68,40 @@ void initializeLogger(const std::string &configFilePath)
 	LoggerConfig config(configFilePath);
 	auto		 jsonConfig = config.getConfig();
 
-	if (!jsonConfig.contains("sinks"))
+	if (!jsonConfig.contains(LOGGER_CONFIG_SINK))
 	{
 		addConsoleOutput(LogLevel::Info, std::chrono::microseconds(0), "[%Y-%m-%d %H:%M:%S.%e] [%l] %v"); // Adding basic Console output for logger by default
 		return;
 	}
 
 
-	for (auto &sinkConfig : jsonConfig["sinks"])
+	for (auto &sinkConfig : jsonConfig[LOGGER_CONFIG_SINK])
 	{
 		// Use default type "console" and level "info" if missing.
-		std::string type	 = sinkConfig.value("type", "console");
-		std::string levelStr = sinkConfig.value("level", "info");
+		std::string type	 = sinkConfig.value(LOGGER_CONFIG_SINK_TYPE, "console");
+		std::string levelStr = sinkConfig.value(LOGGER_CONFIG_LEVEL, "info");
 		LogLevel	level	 = toLogLevel(levelStr);
 
 		if (type == "console")
 		{
-			auto		maxSkipDuration = std::chrono::milliseconds(sinkConfig.value("maxSkipDuration", 0));
-			std::string pattern			= sinkConfig.value("pattern", "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+			auto		maxSkipDuration = std::chrono::milliseconds(sinkConfig.value(LOGGER_CONFIG_MAX_SKIP_DURATION, 0));
+			std::string pattern			= sinkConfig.value(LOGGER_CONFIG_PATTERN, "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
 
 			addConsoleOutput(level, maxSkipDuration, pattern);
 		}
 		else if (type == "file")
 		{
-			auto		maxSkipDuration = std::chrono::microseconds(sinkConfig.value("maxSkipDuration", 0));
-			std::string fileName		= sinkConfig.value("fileName", "default.log");
-			size_t		maxFileSize		= sinkConfig.value("maxFileSize", 10_MB);
-			size_t		maxFiles		= sinkConfig.value("maxFiles", 3);
-			bool		rotateOnSession = sinkConfig.value("rotateOnSession", false);
+			auto		maxSkipDuration = std::chrono::microseconds(sinkConfig.value(LOGGER_CONFIG_MAX_SKIP_DURATION, 0));
+			std::string fileName		= sinkConfig.value(LOGGER_CONFIG_FILE_NAME, "default.log");
+			size_t		maxFileSize		= sinkConfig.value(LOGGER_CONFIG_MAX_FILE_SIZE, 10_MB);
+			size_t		maxFiles		= sinkConfig.value(LOGGER_CONFIG_MAX_FILES, 3);
+			bool		rotateOnSession = sinkConfig.value(LOGGER_CONFIG_ROTATE_ON_SESSION, false);
 			addFileOutput(level, maxSkipDuration, fileName, maxFileSize, maxFiles, rotateOnSession);
 		}
 		else if (type == "msvc")
 		{
-			bool checkForDebugger = sinkConfig.value("checkForDebugger", false);
-			auto maxSkipDuration  = std::chrono::microseconds(sinkConfig.value("maxSkipDuration", 0));
+			bool checkForDebugger = sinkConfig.value(LOGGER_CONFIG_CHECK_FOR_DEBUGGER, false);
+			auto maxSkipDuration  = std::chrono::microseconds(sinkConfig.value(LOGGER_CONFIG_MAX_SKIP_DURATION, 0));
 			addMSVCOutput(level, checkForDebugger, maxSkipDuration);
 		}
 	}

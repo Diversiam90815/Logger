@@ -70,3 +70,22 @@ target_link_libraries(${PROJECT_NAME} PRIVATE   spdlog::spdlog
                                                 nlohmann_json::nlohmann_json)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${HEADER_DIR})
+
+
+#----------------------------
+# DEFINING JSON SETTING NAMES
+#----------------------------
+
+set(LOGGER_CONFIG_SINK "sinks" CACHE STRING "JSON key for logger sinks")
+set(LOGGER_CONFIG_SINK_TYPE "type" CACHE STRING "JSON key for sink type")
+set(LOGGER_CONFIG_LEVEL "level" CACHE STRING "JSON key for log level")
+set(LOGGER_CONFIG_MAX_SKIP_DURATION "max_skip_duration" CACHE STRING "JSON key for max skip duration")
+set(LOGGER_CONFIG_FILE_NAME "file_name" CACHE STRING "JSON key for file name")
+set(LOGGER_CONFIG_MAX_FILE_SIZE "max_file_size" CACHE STRING "JSON key for max file size")
+set(LOGGER_CONFIG_MAX_FILES "max_files" CACHE STRING "JSON key for max files")
+set(LOGGER_CONFIG_ROTATE_ON_SESSION "rotate_on_session" CACHE STRING "JSON key for file rotation on session")
+set(LOGGER_CONFIG_CHECK_FOR_DEBUGGER "check_for_debugger" CACHE STRING "JSON key for MSVC sink debugger check")
+set(LOGGER_CONFIG_PATTERN "pattern" CACHE STRING "JSON key for log pattern")
+
+configure_file(LoggerJSONConfigNames.h.in LoggerJSONConfigNames.h @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
