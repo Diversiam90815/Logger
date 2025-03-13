@@ -6,6 +6,7 @@
 */
 
 #pragma once
+#include <memory>
 
 #include "Formatter.h"
 #include "Helper.h"
@@ -25,7 +26,7 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
 
-void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration = std::chrono::microseconds(0));
+void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration = std::chrono::microseconds(0), std::unique_ptr<spdlog::formatter> formatter = std::make_unique<Formatter>());
 
 void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
 

@@ -27,7 +27,8 @@ void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration)
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << "Error creating console output sink " << e.what() << std::endl;
+		auto logger = getOrCreateLogger();
+		logger->error("Error creating console output sink : {}", e.what());
 	}
 }
 
@@ -44,7 +45,8 @@ void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, st
 
 	catch (const std::exception &e)
 	{
-		std::cerr << "Error creating rotating file sink " << e.what() << std::endl;
+		auto logger = getOrCreateLogger();
+		logger->error("Error creating rotating file sink : {}", e.what());
 	}
 }
 
@@ -62,38 +64,35 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
 {
+	static std::once_flag				   flag;
+	static std::shared_ptr<spdlog::logger> logger;
+
 	if (drop)
 	{
 		spdlog::drop_all();
 	}
 
-	std::shared_ptr<spdlog::logger> logger;
-
-	if (spdlog::default_logger() != nullptr)
-	{
-		logger = spdlog::default_logger();
-	}
-	else
-	{
-		static std::mutex			create_mutex;
-		std::lock_guard<std::mutex> lock(create_mutex);
-
-		auto					   &loggerName = "DefaultLogger";
-		logger								   = std::make_shared<spdlog::logger>(loggerName);
-		logger->set_level(spdlog::level::trace);
-		logger->flush_on(spdlog::level::trace);
-
-		spdlog::register_logger(logger);
-		spdlog::set_default_logger(logger);
-	}
+	std::call_once(flag,
+				   []()
+				   {
+					   auto loggerName = "DefaultLogger";
+					   logger			= std::make_shared<spdlog::logger>(loggerName);
+					   logger->set_level(spdlog::level::trace);
+					   logger->flush_on(spdlog::level::trace);
+					   spdlog::register_logger(logger);
+					   spdlog::set_default_logger(logger);
+				   });
 
 	return logger;
 }
 
 
-void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration)
+void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration, std::unique_ptr<spdlog::formatter> formatter)
 {
-	sink->set_formatter(std::make_unique<Formatter>());
+	if (formatter)
+	{
+		sink->set_formatter(std::move(formatter));
+	}
 
 	static std::mutex			sink_mutex;
 	std::lock_guard<std::mutex> lock(sink_mutex);
@@ -113,7 +112,12 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	}
 
 	// set sinks for all loggers
-	spdlog::apply_all([sinks](std::shared_ptr<spdlog::logger> l) { l->sinks().assign(sinks.begin(), sinks.end()); });
+	spdlog::apply_all(
+		[sinks](std::shared_ptr<spdlog::logger> l)
+		{
+			l->sinks().assign(sinks.begin(), sinks.end());
+			l->set_level(spdlog::level::debug);
+		});
 }
 
 
