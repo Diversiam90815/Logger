@@ -1,10 +1,8 @@
 /*
-  ==============================================================================
-
+==============================================================================
 	Module			LoggerWrapper
 	Description		A builder class to configure and create an SPDLog logger.
-
-  ==============================================================================
+==============================================================================
 */
 
 #include <spdlog/sinks/rotating_file_sink.h>
@@ -100,11 +98,12 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 	static std::mutex			sink_mutex;
 	std::lock_guard<std::mutex> lock(sink_mutex);
 
-	auto					   &sinks = LoggerRegistry::sInstance().sinks();
+	auto					   &sinks = LoggerManager::GetInstance()->sinks();
 
-	if (maxSkipDuration > std::chrono::seconds(0))
+	if (maxSkipDuration > std::chrono::microseconds(0))
 	{
 		auto dupFilter = std::make_shared<spdlog::sinks::dup_filter_sink_mt>(maxSkipDuration);
+		dupFilter->set_level(sink->level());
 		dupFilter->add_sink(sink);
 		sinks.push_back(dupFilter);
 	}
@@ -115,12 +114,6 @@ void registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDurati
 
 	// set sinks for all loggers
 	spdlog::apply_all([sinks](std::shared_ptr<spdlog::logger> l) { l->sinks().assign(sinks.begin(), sinks.end()); });
-}
-
-
-void dropAllAndCreateDefaultLogger()
-{
-	getOrCreateLogger(true);
 }
 
 
@@ -137,7 +130,7 @@ void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 
 // File Options:
 
-FileOptions &FileOptions::setFilename(std::string filename)
+FileOptions &FileOptions::setFilename(std::string &filename)
 {
 	this->filename = filename;
 	return *this;
@@ -185,6 +178,5 @@ MSVCOptions addMSVCOutput()
 {
 	return {};
 }
-
 
 } // namespace logging

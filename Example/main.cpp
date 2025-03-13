@@ -4,9 +4,6 @@
 #include "LoggerWrapper.h"
 #include "PrintMacros.h"
 
-#define LOG_MODULE_NAME "MainFileExample"
-
-
 
 static void LoggingMessagesForTest()
 {
@@ -27,7 +24,8 @@ int main()
 	using namespace filesize;
 
 	// Configure logging outputs
-	logging::addFileOutput().setFilename("TestLog.log").setLevel(LogLevel::Info).setMaxFileSize(20_MB).setRotateOnSession(true);
+	std::string fileName = "TestLog.log";
+	logging::addFileOutput().setFilename(fileName).setLevel(LogLevel::Info).setMaxFileSize(20_MB).setRotateOnSession(true);
 
 	// Maybe also add console output at a different level
 	logging::addConsoleOutput().setLevel(LogLevel::Debug);

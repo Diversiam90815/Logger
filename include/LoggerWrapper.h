@@ -1,17 +1,15 @@
 /*
-  ==============================================================================
-
+==============================================================================
 	Module			LoggerWrapper
 	Description		A builder class to configure and create an SPDLog logger.
-
-  ==============================================================================
+==============================================================================
 */
 
 #pragma once
 
 #include "Formatter.h"
 #include "Helper.h"
-#include "LoggerRegistry.h"
+#include "LoggerManager.h"
 
 using namespace filesize;
 
@@ -27,30 +25,31 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
 
-void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration);
-
-void							dropAllAndCreateDefaultLogger();
+void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration = std::chrono::microseconds(0));
 
 void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
+
+
+
 
 
 /*
  *	@brief		Options for specifying custom sink's features
  */
-template <typename Output>
+template <typename LogOutput>
 struct Options
 {
 public:
-	Output &setLevel(LogLevel level) noexcept
+	LogOutput &setLevel(LogLevel level) noexcept
 	{
 		this->level = level;
-		return static_cast<Output &>(*this);
+		return static_cast<LogOutput &>(*this);
 	}
 
-	Output &setMaxSkipDuration(std::chrono::microseconds maxSkipDuration) noexcept
+	LogOutput &setMaxSkipDuration(std::chrono::microseconds maxSkipDuration) noexcept
 	{
 		this->maxSkipDuration = maxSkipDuration;
-		return static_cast<Output &>(*this);
+		return static_cast<LogOutput &>(*this);
 	}
 
 protected:
@@ -85,7 +84,7 @@ struct FileOptions : Options<FileOptions>
 		logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession);
 	}
 
-	FileOptions &setFilename(std::string filename);
+	FileOptions &setFilename(std::string &filename);
 	FileOptions &setMaxFileSize(size_t maxFileSize);
 	FileOptions &setMaxFiles(size_t maxFiles);
 	FileOptions &setRotateOnSession(bool rotateOnSession);
