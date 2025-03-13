@@ -3,7 +3,7 @@
 	Module			Helper
 	Description		Constants and Helper methods needed throughout the project
 ==============================================================================
-*/ 
+*/
 
 #pragma once
 
@@ -47,4 +47,23 @@ spdlog::level::level_enum toSpdLogLevel(LogLevel level)
 	default: return spdlog::level::off;
 	}
 }
+
+LogLevel toLogLevel(const std::string &level)
+{
+	if (level == "trace")
+		return LogLevel::Trace;
+	if (level == "debug")
+		return LogLevel::Debug;
+	if (level == "info")
+		return LogLevel::Info;
+	if (level == "warn")
+		return LogLevel::Warn;
+	if (level == "error")
+		return LogLevel::Error;
+	if (level == "critical")
+		return LogLevel::Critical;
+	throw std::invalid_argument("Invalid log level: " + level);
+}
+
+
 } // anonymous namespace

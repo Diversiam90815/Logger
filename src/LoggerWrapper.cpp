@@ -62,6 +62,32 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 #endif // _WIN32
 }
 
+void initializeLogger(const std::string &configFilePath)
+{
+	LoggerConfig config(configFilePath);
+	auto		 jsonConfig = config.getConfig();
+
+	for (auto &sinkConfig : jsonConfig["sinks"])
+	{
+		std::string type  = sinkConfig["type"];
+		LogLevel	level = toLogLevel(sinkConfig["level"]);
+
+		if (type == "console")
+		{
+			addConsoleOutput(level, std::chrono::milliseconds(sinkConfig["maxSkipDuration"]), sinkConfig["pattern"]);
+		}
+		else if (type == "file")
+		{
+			addFileOutput(level, std::chrono::microseconds(sinkConfig["maxSkipDuration"]), sinkConfig["fileName"], sinkConfig["maxFileSize"], sinkConfig["maxFiles"],
+						  sinkConfig["rotateOnSession"]);
+		}
+		else if (type == "msvc")
+		{
+			addMSVCOutput(level, sinkConfig["checkForDebuggerPresent"], std::chrono::microseconds(sinkConfig["maxSkipDuration"]));
+		}
+	}
+}
+
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
 {
