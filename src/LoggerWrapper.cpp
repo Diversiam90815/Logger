@@ -93,7 +93,7 @@ void initializeLogger(const std::string &configFilePath)
 		{
 			auto		maxSkipDuration = std::chrono::microseconds(sinkConfig.value(LOGGER_CONFIG_MAX_SKIP_DURATION, 0));
 			std::string fileName		= sinkConfig.value(LOGGER_CONFIG_FILE_NAME, "default.log");
-			size_t		maxFileSize		= sinkConfig.value(LOGGER_CONFIG_MAX_FILE_SIZE, 10_MB);
+			size_t		maxFileSize		= sinkConfig.value(LOGGER_CONFIG_MAX_FILE_SIZE, 10_MB); // TODO: Still need to be parsed correctly
 			size_t		maxFiles		= sinkConfig.value(LOGGER_CONFIG_MAX_FILES, 3);
 			bool		rotateOnSession = sinkConfig.value(LOGGER_CONFIG_ROTATE_ON_SESSION, false);
 			addFileOutput(level, maxSkipDuration, fileName, maxFileSize, maxFiles, rotateOnSession);

@@ -30,10 +30,13 @@ target_link_libraries(MyApp PRIVATE Logger)
 
 Because the Logger uses a PUBLIC include for its headers, you do not need extra include_directories for the Logger — they are automatically made available to your target.
 
+
 ### In your code:
-**Programmatic Initialization**
+
+### Programmatic Initialization
 
 You can manually add sinks using the provided builder methods:
+
 ```cpp
 #include "Logger.h"
 
@@ -55,7 +58,7 @@ int main()
 }
 ```
 
-**JSON Configuration Initialization**
+### JSON Configuration Initialization
 
 Alternatively, you can initialize the logger via a JSON configuration file. Create a JSON file (e.g. `logger_config.json`) with the following structure:
 
@@ -65,17 +68,17 @@ Alternatively, you can initialize the logger via a JSON configuration file. Crea
         {
             "type": "console",
             "level": "debug",
-            "maxSkipDuration": 0,
+            "max_skip_duration": 0,
             "pattern": "[%Y-%m-%d %H:%M:%S.%e] [%l] %v"
         },
         {
             "type": "file",
             "level": "info",
-            "maxSkipDuration": 0,
-            "fileName": "logs/app.log",
-            "maxFileSize": 10485760,
-            "maxFiles": 3,
-            "rotateOnSession": true
+            "max_skip_duration": 0,
+            "file_name": "logs/app.log",
+            "max_file_size": 10_MB,
+            "max_files": 3,
+            "rotate_on_session": true
         }
     ]
 }
@@ -100,6 +103,29 @@ int main()
 ```
 
 This approach leverages [nlohmann json](https://github.com/nlohmann/json) (integrated via CPM) to parse the configuration file and set up the sinks accordingly. If a key is missing, a sensible default will be used.
+
+### Overriding JSON Configuration Keys
+
+This project defines the JSON key names (used in the configuration file) as CMake Cache variables. This means that when you include Logger as a subdirectory in your project, you can easily override these defaults without modifying the Logger source code.
+
+### How to override
+
+Before adding the Logger subdirectory in your parent project's CMakeLists.txt, set the desired values for the JSON keys. For example:
+
+```cmake
+# Override default JSON key names
+set(LOGGER_CONFIG_SINK "custom_sinks" CACHE STRING "JSON key for logger sinks")
+set(LOGGER_CONFIG_LEVEL "custom_level" CACHE STRING "JSON key for log level")
+# ...set other keys as needed
+
+add_subdirectory(path/to/Logger)
+```
+
+Alternatively, you can override these values on the command line when configuring your project:
+
+```bash
+cmake -DLOGGER_CONFIG_SINK="custom_sinks" -DLOGGER_CONFIG_LEVEL="custom_level" <path-to-your-project>
+```
 
 
 ## Default values
