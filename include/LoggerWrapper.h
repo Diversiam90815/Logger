@@ -29,10 +29,11 @@ std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
 void							registerSink(spdlog::sink_ptr					sink,
 											 std::chrono::microseconds			maxSkipDuration = std::chrono::microseconds(0),
 											 std::unique_ptr<spdlog::formatter> formatter		= std::make_unique<Formatter>());
-
 void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
 
+void							setLoggerName(std::string &name);
 
+std::string						getLoggerName();
 
 /*
  *	@brief		Options for specifying custom sink's features

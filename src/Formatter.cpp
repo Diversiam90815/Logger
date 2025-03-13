@@ -29,14 +29,7 @@ void Formatter::format(const spdlog::details::log_msg &msg, spdlog::memory_buf_t
 
 	std::string	  userMessage(msg.payload.begin(), msg.payload.end());
 
-	constexpr int TIME_WIDTH   = 23; // "YYYY-MM-DD HH:MM:SS.mmm" ~ 23 chars
-	constexpr int THREAD_WIDTH = 6;
-	constexpr int LEVEL_WIDTH  = 5;
-	constexpr int MODULE_WIDTH = 18;
-	constexpr int FUNC_WIDTH   = 25;
-
-	auto formatted_line = fmt::format("{:<{}} {:>{}} {:<{}} {:<{}} {:<{}} {}", timeString, TIME_WIDTH, threadID, THREAD_WIDTH, levelString, LEVEL_WIDTH, fileName, MODULE_WIDTH,
-									  funcName, FUNC_WIDTH, userMessage);
+	auto		  formatted_line = fmt::format("{:<25.25} {:>8} {:<8.8} {:<20.20} {:<45.45} {}", timeString, threadID, levelString, fileName, funcName, userMessage);
 
 	fmt::format_to(std::back_inserter(dest), "{}\n", formatted_line);
 }

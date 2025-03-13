@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.1.24)
+set(LOGGER_VERSION 1.1.37)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
@@ -27,9 +27,9 @@ CPMAddPackage(
     SOURCE_DIR ${LIB_DIR}/spdlog
 )
 
-set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/src/)
-set(HEADER_DIR ${PROJECT_SOURCE_DIR}/include/)
-set(EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/Example/)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+set(EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Example/)
 
 set(Source_Files 
     ${SOURCE_DIR}/LoggerWrapper.cpp
@@ -52,11 +52,8 @@ set(Example_Files
 )
 
 # Create the library
-add_library(Logger STATIC ${Source_Files} ${Header_Files})
-target_link_libraries(Logger PUBLIC spdlog::spdlog)
-target_include_directories(Logger PUBLIC ${HEADER_DIR})
+add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
-# Create the example executable
-add_executable(LoggerExecutable ${Example_Files})
-target_link_libraries(LoggerExecutable PRIVATE Logger)
-target_include_directories(LoggerExecutable PRIVATE ${HEADER_DIR})
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})

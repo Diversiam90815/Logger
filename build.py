@@ -145,7 +145,6 @@ class BuildRunner(object):
             print(f"Error retrieving CMake version: {e}")
 
 
-
     def _build_prepare(self):
         projectfolderVS =  os.path.join(self.args.path_project)
         autoCWD = AutoCWD(projectfolderVS)

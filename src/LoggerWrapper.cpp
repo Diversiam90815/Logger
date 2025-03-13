@@ -131,6 +131,19 @@ void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 }
 
 
+void setLoggerName(std::string &name)
+{
+	LoggerRegistry::sInstance().setLoggerName(name);
+}
+
+
+std::string getLoggerName()
+{
+	return LoggerRegistry::sInstance().getLoggerName();
+}
+
+
+
 // Options:
 
 // File Options:
