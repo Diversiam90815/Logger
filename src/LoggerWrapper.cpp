@@ -62,28 +62,47 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 #endif // _WIN32
 }
 
+
 void initializeLogger(const std::string &configFilePath)
 {
 	LoggerConfig config(configFilePath);
 	auto		 jsonConfig = config.getConfig();
 
+	if (!jsonConfig.contains("sinks"))
+	{
+		addConsoleOutput(LogLevel::Info, std::chrono::microseconds(0), "[%Y-%m-%d %H:%M:%S.%e] [%l] %v"); // Adding basic Console output for logger by default
+		return;
+	}
+
+
 	for (auto &sinkConfig : jsonConfig["sinks"])
 	{
-		std::string type  = sinkConfig["type"];
-		LogLevel	level = toLogLevel(sinkConfig["level"]);
+		// Use default type "console" and level "info" if missing.
+		std::string type	 = sinkConfig.value("type", "console");
+		std::string levelStr = sinkConfig.value("level", "info");
+		LogLevel	level	 = toLogLevel(levelStr);
 
 		if (type == "console")
 		{
-			addConsoleOutput(level, std::chrono::milliseconds(sinkConfig["maxSkipDuration"]), sinkConfig["pattern"]);
+			auto		maxSkipDuration = std::chrono::milliseconds(sinkConfig.value("maxSkipDuration", 0));
+			std::string pattern			= sinkConfig.value("pattern", "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+
+			addConsoleOutput(level, maxSkipDuration, pattern);
 		}
 		else if (type == "file")
 		{
-			addFileOutput(level, std::chrono::microseconds(sinkConfig["maxSkipDuration"]), sinkConfig["fileName"], sinkConfig["maxFileSize"], sinkConfig["maxFiles"],
-						  sinkConfig["rotateOnSession"]);
+			auto		maxSkipDuration = std::chrono::microseconds(sinkConfig.value("maxSkipDuration", 0));
+			std::string fileName		= sinkConfig.value("fileName", "default.log");
+			size_t		maxFileSize		= sinkConfig.value("maxFileSize", 10_MB);
+			size_t		maxFiles		= sinkConfig.value("maxFiles", 3);
+			bool		rotateOnSession = sinkConfig.value("rotateOnSession", false);
+			addFileOutput(level, maxSkipDuration, fileName, maxFileSize, maxFiles, rotateOnSession);
 		}
 		else if (type == "msvc")
 		{
-			addMSVCOutput(level, sinkConfig["checkForDebuggerPresent"], std::chrono::microseconds(sinkConfig["maxSkipDuration"]));
+			bool checkForDebugger = sinkConfig.value("checkForDebugger", false);
+			auto maxSkipDuration  = std::chrono::microseconds(sinkConfig.value("maxSkipDuration", 0));
+			addMSVCOutput(level, checkForDebugger, maxSkipDuration);
 		}
 	}
 }

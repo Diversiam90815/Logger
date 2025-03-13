@@ -29,7 +29,6 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 void initializeLogger(const std::string& configFilePath);
 
 
-
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
 
 void							registerSink(spdlog::sink_ptr					sink,
