@@ -27,6 +27,19 @@ CPMAddPackage(
     SOURCE_DIR ${LIB_DIR}/spdlog
 )
 
+
+#----------------------------
+# NLOHMANN JSON
+#----------------------------
+
+CPMAddPackage(
+    NAME nlohmann_json
+    GITHUB_REPOSITORY nlohmann/json
+    VERSION 3.11.2
+    SOURCE_DIR ${LIB_DIR}/nlohmann_json
+)
+
+
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 set(EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Example/)
@@ -43,6 +56,7 @@ set(Header_Files
     ${HEADER_DIR}/Formatter.h
     ${HEADER_DIR}/Helper.h
     ${HEADER_DIR}/LoggerManager.h
+    ${HEADER_DIR}/LoggerConfig.h
 )
 
 set(Example_Files 
@@ -52,6 +66,7 @@ set(Example_Files
 # Create the library
 add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE   spdlog::spdlog 
+                                                nlohmann_json::nlohmann_json)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${HEADER_DIR})
