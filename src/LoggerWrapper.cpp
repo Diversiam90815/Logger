@@ -16,12 +16,13 @@
 namespace logging
 {
 
-void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration)
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string &pattern)
 {
 	try
 	{
 		auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 		sink->set_level(toSpdLogLevel(level));
+		sink->set_pattern(pattern);
 
 		registerSink(sink, maxSkipDuration);
 	}
@@ -76,7 +77,7 @@ std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop)
 				   []()
 				   {
 					   auto loggerName = "DefaultLogger";
-					   logger			= std::make_shared<spdlog::logger>(loggerName);
+					   logger		   = std::make_shared<spdlog::logger>(loggerName);
 					   logger->set_level(spdlog::level::trace);
 					   logger->flush_on(spdlog::level::trace);
 					   spdlog::register_logger(logger);

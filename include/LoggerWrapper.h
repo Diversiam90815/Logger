@@ -17,7 +17,7 @@ using namespace filesize;
 
 namespace logging
 {
-void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration);
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string &pattern = "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
 
 void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 
@@ -26,11 +26,11 @@ void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::mi
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
 
-void							registerSink(spdlog::sink_ptr sink, std::chrono::microseconds maxSkipDuration = std::chrono::microseconds(0), std::unique_ptr<spdlog::formatter> formatter = std::make_unique<Formatter>());
+void							registerSink(spdlog::sink_ptr					sink,
+											 std::chrono::microseconds			maxSkipDuration = std::chrono::microseconds(0),
+											 std::unique_ptr<spdlog::formatter> formatter		= std::make_unique<Formatter>());
 
 void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
-
-
 
 
 
@@ -66,10 +66,7 @@ struct ConsoleOptions : Options<ConsoleOptions>
 {
 	ConsoleOptions()							= default;
 	ConsoleOptions(const ConsoleOptions &other) = delete;
-	~ConsoleOptions()
-	{
-		logging::addConsoleOutput(level, maxSkipDuration);
-	}
+	~ConsoleOptions() { logging::addConsoleOutput(level, maxSkipDuration); }
 };
 
 
@@ -80,10 +77,7 @@ struct FileOptions : Options<FileOptions>
 {
 	FileOptions()						  = default;
 	FileOptions(const FileOptions &other) = delete;
-	~FileOptions()
-	{
-		logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession);
-	}
+	~FileOptions() { logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession); }
 
 	FileOptions &setFilename(std::string &filename);
 	FileOptions &setMaxFileSize(size_t maxFileSize);
@@ -106,10 +100,7 @@ struct MSVCOptions : Options<MSVCOptions>
 public:
 	MSVCOptions()						  = default;
 	MSVCOptions(const MSVCOptions &other) = delete;
-	~MSVCOptions()
-	{
-		logging::addMSVCOutput(level, checkForDebugger, maxSkipDuration);
-	}
+	~MSVCOptions() { logging::addMSVCOutput(level, checkForDebugger, maxSkipDuration); }
 
 	MSVCOptions &checkForPresentDebugger(bool check);
 
