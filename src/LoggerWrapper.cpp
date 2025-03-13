@@ -16,7 +16,7 @@
 namespace logging
 {
 
-void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string &pattern)
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string pattern)
 {
 	try
 	{
@@ -133,13 +133,13 @@ void log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg)
 
 void setLoggerName(std::string &name)
 {
-	LoggerRegistry::sInstance().setLoggerName(name);
+	LoggerManager::GetInstance()->setLoggerName(name);
 }
 
 
 std::string getLoggerName()
 {
-	return LoggerRegistry::sInstance().getLoggerName();
+	return LoggerManager::GetInstance()->getLoggerName();
 }
 
 

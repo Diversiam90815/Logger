@@ -17,7 +17,7 @@ using namespace filesize;
 
 namespace logging
 {
-void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string &pattern = "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string pattern = "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
 
 void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 

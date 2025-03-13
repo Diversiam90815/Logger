@@ -38,6 +38,9 @@ public:
 
 	LogLevel					  &defaultLogLevel() { return mDefaultLogLevel; }
 
+	void						   setLoggerName(std::string &name) { mLoggerName = name; }
+
+	std::string					   getLoggerName() { return mLoggerName; }
 
 private:
 	LoggerManager()												   = default;
@@ -46,7 +49,7 @@ private:
 	LoggerManager				 &operator=(const LoggerManager &) = delete;
 
 
-	std::vector<spdlog::sink_ptr> mSinks;
-
+	std::vector<spdlog::sink_ptr> mSinks{};
+	std::string					  mLoggerName	   = "";
 	LogLevel					  mDefaultLogLevel = {LogLevel::Info};
 };
