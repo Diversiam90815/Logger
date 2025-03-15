@@ -48,6 +48,7 @@ void LoggerImpl::addConsoleOutput(LogLevel level, std::chrono::microseconds maxS
 	auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	sink->set_pattern(pattern);
 	sink->set_level(toSpdLogLevel(level));
+	sink->set_formatter(std::make_unique<Formatter>());
 
 	{
 		std::lock_guard<std::mutex> lock(data->mtx);
@@ -61,6 +62,7 @@ void LoggerImpl::addFileOutput(LogLevel level, std::chrono::microseconds maxSkip
 {
 	auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(fileName, maxFileSize, maxFiles, rotateOnSession);
 	sink->set_level(toSpdLogLevel(level));
+	sink->set_formatter(std::make_unique<Formatter>());
 
 	{
 		std::lock_guard<std::mutex> lock(data->mtx);
@@ -75,6 +77,7 @@ void LoggerImpl::addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std
 #ifdef _WIN32
 	auto sink = std::make_shared<spdlog::sinks::msvc_sink_mt>(checkForDebuggerPresent);
 	sink->set_level(toSpdLogLevel(level));
+	sink->set_formatter(std::make_unique<Formatter>());
 
 	{
 		std::lock_guard<std::mutex> lock(data->mtx);
