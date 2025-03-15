@@ -12,6 +12,7 @@
 
 #include "LoggerWrapper.h"
 
+using namespace filesize;
 
 namespace logging
 {
@@ -93,7 +94,7 @@ void initializeLogger(const std::string &configFilePath)
 		{
 			auto		maxSkipDuration = std::chrono::microseconds(sinkConfig.value(LOGGER_CONFIG_MAX_SKIP_DURATION, 0));
 			std::string fileName		= sinkConfig.value(LOGGER_CONFIG_FILE_NAME, "default.log");
-			size_t		maxFileSize		= sinkConfig.value(LOGGER_CONFIG_MAX_FILE_SIZE, 10_MB); // TODO: Still need to be parsed correctly
+			size_t		maxFileSize		= getFileSize(sinkConfig, LOGGER_CONFIG_MAX_FILE_SIZE, 10_MB);
 			size_t		maxFiles		= sinkConfig.value(LOGGER_CONFIG_MAX_FILES, 3);
 			bool		rotateOnSession = sinkConfig.value(LOGGER_CONFIG_ROTATE_ON_SESSION, false);
 			addFileOutput(level, maxSkipDuration, fileName, maxFileSize, maxFiles, rotateOnSession);
@@ -105,6 +106,27 @@ void initializeLogger(const std::string &configFilePath)
 			addMSVCOutput(level, checkForDebugger, maxSkipDuration);
 		}
 	}
+}
+
+
+unsigned long long getFileSize(const json &j, const std::string &key, unsigned long long defaultValue)
+{
+	if (j.contains(key))
+	{
+		if (j[key].is_number_unsigned())
+		{
+			return j[key].get<unsigned long long>();
+		}
+		else if (j[key].is_string())
+		{
+			return parseFileSize(j[key].get<std::string>());
+		}
+		else
+		{
+			throw std::runtime_error("Invalid type for file size in config for key: " + key);
+		}
+	}
+	return defaultValue;
 }
 
 
