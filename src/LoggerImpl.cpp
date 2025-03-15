@@ -6,6 +6,7 @@
 */
 
 #include "LoggerImpl.h"
+#include "Helper.h"
 
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -119,6 +120,27 @@ void LoggerImpl::addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std
 	}
 
 #endif
+}
+
+
+unsigned long long getFileSize(const json &j, const std::string &key, unsigned long long defaultValue)
+{
+	if (j.contains(key))
+	{
+		if (j[key].is_number_unsigned())
+		{
+			return j[key].get<unsigned long long>();
+		}
+		else if (j[key].is_string())
+		{
+			return parseFileSize(j[key].get<std::string>());
+		}
+		else
+		{
+			throw std::runtime_error("Invalid type for file size in config for key: " + key);
+		}
+	}
+	return defaultValue;
 }
 
 

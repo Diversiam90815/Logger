@@ -6,11 +6,10 @@
 */
 
 #pragma once
+
 #include <memory>
 
-// #include "Helper.h"
 #include "Formatter.h"
-#include "LoggerManager.h"
 #include "LoggerConfig.h"
 #include "LoggerJSONConfigNames.h" // Defined names for JSON settings via CMake
 

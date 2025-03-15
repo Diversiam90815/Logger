@@ -17,7 +17,6 @@
 namespace logging
 {
 
-
 class LoggerImpl
 {
 
@@ -33,6 +32,7 @@ public:
 	void initializeLogger(const std::string &configFilePath);
 
 	void log(LogLevel level, const std::string &file, int line, const std::string &function, const std::string &msg);
+
 
 private:
 	LoggerImpl();
