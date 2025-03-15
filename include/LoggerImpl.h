@@ -22,7 +22,7 @@ class LoggerImpl
 {
 
 public:
-	static LoggerImpl &sInstance();
+	static LoggerImpl &GetInstance();
 
 	void			   addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, const std::string &pattern);
 
