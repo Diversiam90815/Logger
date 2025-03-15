@@ -16,9 +16,12 @@ set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 ## Include the CPM (Package Manager used by CMake)
 include(cmake/cpm.cmake)
 
-#----------------------------
-# SPDLOG
-#----------------------------
+
+#-------------------------------------
+#       Thrid Library Packages
+#-------------------------------------
+
+#       SPDLOG
 
 CPMAddPackage(
     NAME spdlog
@@ -28,9 +31,7 @@ CPMAddPackage(
 )
 
 
-#----------------------------
-# NLOHMANN JSON
-#----------------------------
+#       NLOHMANN JSON
 
 CPMAddPackage(
     NAME nlohmann_json
@@ -40,9 +41,14 @@ CPMAddPackage(
 )
 
 
+#-------------------------------------
+#       Project Files
+#-------------------------------------
+
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 set(EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Example/)
+
 
 set(Source_Files 
     ${SOURCE_DIR}/LoggerWrapper.cpp
@@ -50,33 +56,44 @@ set(Source_Files
     ${SOURCE_DIR}/LoggerImpl.cpp
 )
 
+
 set(Header_Files 
-    ${HEADER_DIR}/Logger.h  
-    ${HEADER_DIR}/LoggerWrapper.h  
-    ${HEADER_DIR}/PrintMacros.h
-    ${HEADER_DIR}/Formatter.h
-    ${HEADER_DIR}/Helper.h
-    ${HEADER_DIR}/LoggerManager.h
-    ${HEADER_DIR}/LoggerConfig.h
-    ${HEADER_DIR}/LoggerImpl.h
+    ${HEADER_DIR}/Logger/Logger.h  
+    ${HEADER_DIR}/Logger/LoggerWrapper.h  
+    ${HEADER_DIR}/Logger/PrintMacros.h
+    ${HEADER_DIR}/Logger/Formatter.h
+    ${HEADER_DIR}/Logger/Helper.h
+    ${HEADER_DIR}/Logger/LoggerConfig.h
 )
+
 
 set(Example_Files 
     ${EXAMPLE_DIR}/main.cpp
 )
 
-# Create the library
-add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC   spdlog::spdlog 
-                                                nlohmann_json::nlohmann_json)
+#-------------------------------------
+#       Create Static Library
+#-------------------------------------
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+add_library(${PROJECT_NAME} STATIC ${Source_Files})
 
 
-#----------------------------
-#   Create Example Executable
-#----------------------------
+target_link_libraries(${PROJECT_NAME} PRIVATE     
+                spdlog::spdlog 
+                nlohmann_json::nlohmann_json
+)
+
+
+target_include_directories(${PROJECT_NAME} 
+        PUBLIC  ${HEADER_DIR}/Logger
+        PRIVATE ${HEADER_DIR}/Logger/detail
+)
+
+
+#-------------------------------------
+#       Create Example Executable
+#-------------------------------------
 
 option(BUILD_EXAMPLE "Build the logger example executable" OFF)
 
@@ -86,9 +103,9 @@ if(BUILD_EXAMPLE)
 endif()
 
 
-#----------------------------
-# DEFINING JSON SETTING NAMES
-#----------------------------
+#-------------------------------------
+#       Defining JSON sink config names
+#-------------------------------------
 
 set(LOGGER_CONFIG_SINK "sinks" CACHE STRING "JSON key for logger sinks")
 set(LOGGER_CONFIG_SINK_TYPE "type" CACHE STRING "JSON key for sink type")

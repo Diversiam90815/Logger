@@ -8,11 +8,7 @@
 #pragma once
 
 #include <memory>
-
-#include "Formatter.h"
-#include "LoggerConfig.h"
-#include "LoggerJSONConfigNames.h" // Defined names for JSON settings via CMake
-
+#include <chrono>
 
 enum class LogLevel
 {

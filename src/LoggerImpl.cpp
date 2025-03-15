@@ -20,6 +20,10 @@
 #include <spdlog/formatter.h>
 #include <spdlog/details/log_msg.h>
 
+#include "Formatter.h"
+#include "LoggerConfig.h"
+#include "LoggerJSONConfigNames.h" // Defined names for JSON settings via CMake
+
 
 namespace logging
 {
