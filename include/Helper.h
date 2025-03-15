@@ -7,6 +7,7 @@
 
 #pragma once
 
+
 enum class LogLevel
 {
 	Trace,
@@ -93,7 +94,7 @@ unsigned long long parseFileSize(const std::string &sizeStr)
 
 	// Extract the unit
 	std::string		   unit		   = trim(s.substr(pos));
-	unit.erase(std::remove(unit.begin(), unit.end(), "_"), unit.end()); // Remove underscores from unit if necessary
+	unit.erase(std::remove(unit.begin(), unit.end(), '_'), unit.end());
 
 	// Convert unit to upper case
 	for (auto &ch : unit)

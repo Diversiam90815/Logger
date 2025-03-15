@@ -1,8 +1,7 @@
 
 #include <iostream>
 
-#include "LoggerWrapper.h"
-#include "PrintMacros.h"
+#include "Logger.h"
 
 
 static void LoggingMessagesForTest()

@@ -66,10 +66,22 @@ set(Example_Files
 # Create the library
 add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE   spdlog::spdlog 
+target_link_libraries(${PROJECT_NAME} PUBLIC   spdlog::spdlog 
                                                 nlohmann_json::nlohmann_json)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${HEADER_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADER_DIR})
+
+
+#----------------------------
+#   Create Example Executable
+#----------------------------
+
+option(BUILD_EXAMPLE "Build the logger example executable" OFF)
+
+if(BUILD_EXAMPLE)
+    add_executable(LoggerExample ${Example_Files})
+    target_link_libraries(LoggerExample PRIVATE Logger)
+endif()
 
 
 #----------------------------
@@ -86,6 +98,7 @@ set(LOGGER_CONFIG_MAX_FILES "max_files" CACHE STRING "JSON key for max files")
 set(LOGGER_CONFIG_ROTATE_ON_SESSION "rotate_on_session" CACHE STRING "JSON key for file rotation on session")
 set(LOGGER_CONFIG_CHECK_FOR_DEBUGGER "check_for_debugger" CACHE STRING "JSON key for MSVC sink debugger check")
 set(LOGGER_CONFIG_PATTERN "pattern" CACHE STRING "JSON key for log pattern")
+
 
 configure_file(LoggerJSONConfigNames.h.in LoggerJSONConfigNames.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
