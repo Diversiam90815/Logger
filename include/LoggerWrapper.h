@@ -8,9 +8,11 @@
 #pragma once
 #include <memory>
 
-#include "Formatter.h"
 #include "Helper.h"
+#include "Formatter.h"
 #include "LoggerManager.h"
+#include "LoggerConfig.h"
+#include "LoggerJSONConfigNames.h" // Defined names for JSON settings via CMake
 
 using namespace filesize;
 
@@ -22,6 +24,9 @@ void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration,
 void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 
 void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::microseconds maxSkipDuration);
+
+
+void initializeLogger(const std::string &configFilePath);
 
 
 std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
