@@ -8,10 +8,11 @@
 */
 
 #pragma once
-
+#include <fmt/format.h>
 #include "LoggerWrapper.h"
 
-#define LOG(level, fmtStr, ...)	  logging::log(LogLevel::level, spdlog::source_loc{__FILE__, __LINE__, __FUNCTION__}, fmt::format(fmtStr, ##__VA_ARGS__))
+
+#define LOG(level, fmtStr, ...)	  logging::log(LogLevel::level, __FILE__, __LINE__, __FUNCTION__, fmt::format(fmtStr, ##__VA_ARGS__))
 
 #define LOG_TRACE(fmtStr, ...)	  LOG(Trace, fmtStr, ##__VA_ARGS__)
 #define LOG_DEBUG(fmtStr, ...)	  LOG(Debug, fmtStr, ##__VA_ARGS__)

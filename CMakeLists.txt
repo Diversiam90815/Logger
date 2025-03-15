@@ -22,7 +22,6 @@ include(cmake/cpm.cmake)
 #-------------------------------------
 
 #       SPDLOG
-
 CPMAddPackage(
     NAME spdlog
     GITHUB_REPOSITORY gabime/spdlog
@@ -30,9 +29,15 @@ CPMAddPackage(
     SOURCE_DIR ${LIB_DIR}/spdlog
 )
 
+#       FMT
+CPMAddPackage(
+    NAME fmt
+    VERSION 8.1.1
+    GIT_TAG 8.1.1
+    GITHUB_REPOSITORY fmtlib/fmt
+)
 
 #       NLOHMANN JSON
-
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -76,10 +81,13 @@ set(Example_Files
 #       Create Static Library
 #-------------------------------------
 
-add_library(${PROJECT_NAME} STATIC ${Source_Files})
+add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
 
-target_link_libraries(${PROJECT_NAME} PRIVATE     
+target_link_libraries(${PROJECT_NAME} 
+PUBLIC fmt::fmt
+
+PRIVATE     
                 spdlog::spdlog 
                 nlohmann_json::nlohmann_json
 )
@@ -90,16 +98,28 @@ target_include_directories(${PROJECT_NAME}
         PRIVATE ${HEADER_DIR}/Logger/detail
 )
 
+target_compile_definitions(${PROJECT_NAME} 
+    PUBLIC  FMT_HEADER_ONLY
+            SPDLOG_FMT_EXTERNAL
+           # SPDLOG_HEADER_ONLY
+)
+
 
 #-------------------------------------
 #       Create Example Executable
 #-------------------------------------
 
-option(BUILD_EXAMPLE "Build the logger example executable" OFF)
+option(BUILD_EXAMPLE "Build the logger example executable" ON)
 
 if(BUILD_EXAMPLE)
     add_executable(LoggerExample ${Example_Files})
-    target_link_libraries(LoggerExample PRIVATE Logger)
+    target_link_libraries(LoggerExample 
+        PRIVATE Logger
+                fmt::fmt                    
+    )
+    target_compile_definitions(LoggerExample PUBLIC FMT_HEADER_ONLY SPDLOG_FMT_EXTERNAL)
+
+
 endif()
 
 
