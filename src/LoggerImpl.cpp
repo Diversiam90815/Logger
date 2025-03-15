@@ -134,7 +134,12 @@ void LoggerImpl::initializeLogger(const std::string &configFilePath)
 }
 
 
-void LoggerImpl::log(LogLevel level, const std::string &file, int line, const std::string &function, const std::string &msg) {}
+void LoggerImpl::log(LogLevel level, const std::string &file, int line, const std::string &function, const std::string &msg)
+{
+	spdlog::source_loc loc{file.c_str(), line, function.c_str()}; // Create spdlog::source_loc object from provided data
+	auto			   spdLevel = toSpdLogLevel(level);			  // Convert LogLevel to spdlog Level
+	data->logger->log(loc, spdLevel, msg);						  // pass the source_loc along with msg and level
+}
 
 
 
