@@ -47,6 +47,7 @@ set(EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Example/)
 set(Source_Files 
     ${SOURCE_DIR}/LoggerWrapper.cpp
     ${SOURCE_DIR}/Formatter.cpp
+    ${SOURCE_DIR}/LoggerImpl.cpp
 )
 
 set(Header_Files 
@@ -57,6 +58,7 @@ set(Header_Files
     ${HEADER_DIR}/Helper.h
     ${HEADER_DIR}/LoggerManager.h
     ${HEADER_DIR}/LoggerConfig.h
+    ${HEADER_DIR}/LoggerImpl.h
 )
 
 set(Example_Files 

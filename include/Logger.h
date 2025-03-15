@@ -10,5 +10,5 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 
 
-#include "LoggerWrapper.h"
-#include "PrintMacros.h"
+#include "LoggerWrapper.h" // Public Logger functionality
+#include "PrintMacros.h"   // Loging Macros
