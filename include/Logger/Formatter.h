@@ -21,7 +21,7 @@ public:
 	std::unique_ptr<spdlog::formatter> clone() const override;
 
 private:
-	static std::string				   format_time(const spdlog::log_clock::time_point &tp);
+	static std::string format_time(const spdlog::log_clock::time_point &tp);
 
-	static std::string				   get_basename_no_ext(const char *fullpath);
+	static std::string get_basename_no_ext(const char *fullpath);
 };

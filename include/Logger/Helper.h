@@ -1,71 +1,18 @@
 /*
 ==============================================================================
 	Module			Helper
-	Description		Constants and Helper methods needed throughout the project
+	Description		Helper methods needed throughout the project
 ==============================================================================
 */
 
 #pragma once
 
-
-enum class LogLevel
-{
-	Trace,
-	Debug,
-	Info,
-	Warn,
-	Error,
-	Critical
-};
-
-
-namespace filesize
-{
-inline constexpr unsigned long long operator""_KB(unsigned long long value)
-{
-	return value * 1'024;
-}
-
-inline constexpr unsigned long long operator""_MB(unsigned long long value)
-{
-	return value * 1'024 * 1_KB;
-}
-} // namespace filesize
+#include <string>
+#include <stdexcept>
 
 
 namespace
 {
-spdlog::level::level_enum toSpdLogLevel(LogLevel level)
-{
-	switch (level)
-	{
-	case LogLevel::Trace: return spdlog::level::trace;
-	case LogLevel::Debug: return spdlog::level::debug;
-	case LogLevel::Info: return spdlog::level::info;
-	case LogLevel::Warn: return spdlog::level::warn;
-	case LogLevel::Error: return spdlog::level::err;
-	case LogLevel::Critical: return spdlog::level::critical;
-	default: return spdlog::level::off;
-	}
-}
-
-LogLevel toLogLevel(const std::string &level)
-{
-	if (level == "trace")
-		return LogLevel::Trace;
-	if (level == "debug")
-		return LogLevel::Debug;
-	if (level == "info")
-		return LogLevel::Info;
-	if (level == "warn")
-		return LogLevel::Warn;
-	if (level == "error")
-		return LogLevel::Error;
-	if (level == "critical")
-		return LogLevel::Critical;
-	throw std::invalid_argument("Invalid log level: " + level);
-}
-
 
 // Function to trim whitespaces from a string
 std::string trim(const std::string &s)
@@ -74,6 +21,7 @@ std::string trim(const std::string &s)
 	size_t end	 = s.find_last_not_of(" \t\n\r");
 	return (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
 }
+
 
 unsigned long long parseFileSize(const std::string &sizeStr)
 {
@@ -114,6 +62,5 @@ unsigned long long parseFileSize(const std::string &sizeStr)
 	else
 		throw std::invalid_argument("Unkown file size unit: " + unit);
 }
-
 
 } // anonymous namespace

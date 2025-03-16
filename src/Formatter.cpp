@@ -8,9 +8,7 @@
 #include "Formatter.h"
 
 
-Formatter::Formatter()
-{
-}
+Formatter::Formatter() {}
 
 
 void Formatter::format(const spdlog::details::log_msg &msg, spdlog::memory_buf_t &dest)
@@ -25,11 +23,11 @@ void Formatter::format(const spdlog::details::log_msg &msg, spdlog::memory_buf_t
 		fileName.assign(msg.logger_name.data(), msg.logger_name.size());
 	}
 
-	auto		  funcName = (msg.source.funcname ? msg.source.funcname : "");
+	auto		funcName = (msg.source.funcname ? msg.source.funcname : "");
 
-	std::string	  userMessage(msg.payload.begin(), msg.payload.end());
+	std::string userMessage(msg.payload.begin(), msg.payload.end());
 
-	auto		  formatted_line = fmt::format("{:<25.25} {:>8} {:<8.8} {:<20.20} {:<45.45} {}", timeString, threadID, levelString, fileName, funcName, userMessage);
+	auto		formatted_line = fmt::format("{:<25.25} {:>8} {:<8.8} {:<20.20} {:<45.45} {}", timeString, threadID, levelString, fileName, funcName, userMessage);
 
 	fmt::format_to(std::back_inserter(dest), "{}\n", formatted_line);
 }

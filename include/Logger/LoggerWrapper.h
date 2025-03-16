@@ -6,39 +6,52 @@
 */
 
 #pragma once
-#include <memory>
 
-#include "Helper.h"
-#include "Formatter.h"
-#include "LoggerManager.h"
-#include "LoggerConfig.h"
-#include "LoggerJSONConfigNames.h" // Defined names for JSON settings via CMake
+#include <memory>
+#include <chrono>
+
+enum class LogLevel
+{
+	Trace,
+	Debug,
+	Info,
+	Warn,
+	Error,
+	Critical
+};
+
+
+namespace filesize
+{
+inline constexpr unsigned long long operator""_KB(unsigned long long value)
+{
+	return value * 1'024;
+}
+
+inline constexpr unsigned long long operator""_MB(unsigned long long value)
+{
+	return value * 1'024 * 1_KB;
+}
+} // namespace filesize
+
 
 using namespace filesize;
 
-
 namespace logging
 {
-void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string pattern = "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
 
-void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, std::string fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
+class LoggerImpl;
+
+void addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, const std::string &pattern = "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+
+void addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, const std::string &fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession);
 
 void addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std::chrono::microseconds maxSkipDuration);
 
-
 void initializeLogger(const std::string &configFilePath);
 
+void log(LogLevel level, const std::string &file, int line, const std::string &function, const std::string &msg);
 
-std::shared_ptr<spdlog::logger> getOrCreateLogger(bool drop = false);
-
-void							registerSink(spdlog::sink_ptr					sink,
-											 std::chrono::microseconds			maxSkipDuration = std::chrono::microseconds(0),
-											 std::unique_ptr<spdlog::formatter> formatter		= std::make_unique<Formatter>());
-void							log(LogLevel level, const spdlog::source_loc &loc, std::string_view msg);
-
-void							setLoggerName(std::string &name);
-
-std::string						getLoggerName();
 
 /*
  *	@brief		Options for specifying custom sink's features
