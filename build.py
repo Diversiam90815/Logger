@@ -7,7 +7,7 @@ import shutil
 from subprocess import Popen, PIPE, check_output
 
 
-PLATFORM_GENERATOR = '\"Visual Studio 17\"'
+#PLATFORM_GENERATOR = '\"Visual Studio 17\"'
 
 
 class AutoCWD(object):
@@ -27,19 +27,15 @@ class BuildRunner(object):
 
     def __init__(self):   
         formatter_class = lambda prog: argparse.HelpFormatter(prog, max_help_position=100, width=200)
-        description = 'This tool can be used to build and deploy the Distortion project.'
-        epilog = ''
-        parser = argparse.ArgumentParser(description=description, formatter_class=formatter_class, epilog=epilog)
+        parser = argparse.ArgumentParser(description='This tool can be used to build and deploy the Logger project.', formatter_class=formatter_class, epilog='')
         parser.add_argument('-p', '--prepare', action='store_true', help='prepares the project for use with IDE')
         parser.add_argument('-d', '--debug', action='store_true', help='prepare or build debug version')
         parser.add_argument('-b', '--build', action='store_true', help='build the project')
         parser.add_argument('-v', '--version', action='store_true', help='display Python and CMake versions')
 
-
         self.args = parser.parse_args()
-       
         self.version = ""
-
+        self.platform = self._find_latest_visual_studio_version()
         path_project = os.path.dirname(os.path.realpath(__file__))
         self.args.path_project = path_project
 
@@ -75,6 +71,38 @@ class BuildRunner(object):
 
         return result
 
+
+    def _find_latest_visual_studio_version(self):
+        vswhere = os.path.join(os.environ.get("ProgramFiles(x86)"), "Microsoft Visual Studio", "Installer", "vswhere.exe")
+
+        if not os.path.exists(vswhere):
+            print("vswhere.exe not found! Using Visual Studio 2022 as default")
+            return '\"Visual Studio 17\"'
+
+        result = check_output([vswhere, '-latest', '-property', 'installationVersion'], shell=True).decode().strip()
+        versionMatch = re.match(r'^(\d+)', result)
+
+        if versionMatch:
+            vsVersion = versionMatch.group(1)
+            return f'\"Visual Studio {vsVersion}\"'
+
+        else:
+            print("Could not determine latest Visual Studio version. Using Visual Studio 2022 as default")
+            return '\"Visual Studio 17\"'
+
+
+    def _get_vs_path(self):
+        vswhere = os.path.join(os.environ.get("ProgramFiles(x86)"), "Microsoft Visual Studio", "Installer", "vswhere.exe")
+        if not os.path.exists(vswhere):
+            raise FileNotFoundError("vswhere.exe not found. Please install Visual Studio or vswhere tool.")
+
+        installation_path = check_output([vswhere, "-latest", "-property", "installationPath"], shell=True).decode().strip()
+
+        if not installation_path:
+            raise RuntimeError("Could not find a Visual Studio installation.")
+
+        return installation_path
+    
 
     def _get_number_of_commits(self):
         autoCWD = AutoCWD(self.args.path_project)
@@ -149,8 +177,8 @@ class BuildRunner(object):
         projectfolderVS =  os.path.join(self.args.path_project)
         autoCWD = AutoCWD(projectfolderVS)
 
-        prepare_cmd = f'cmake -G {PLATFORM_GENERATOR} -B build'
-        self._execute_command(prepare_cmd, "Select build generator")
+        prepare_cmd = f'cmake -G {self.platform} -B build'
+        self._execute_command(prepare_cmd, f"Select build generator: {self.platform}")
         
         del autoCWD
 

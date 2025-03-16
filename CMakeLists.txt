@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.2.37)
+set(LOGGER_VERSION 1.2.66)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
