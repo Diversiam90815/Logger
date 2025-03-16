@@ -85,11 +85,9 @@ add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
 
 target_link_libraries(${PROJECT_NAME} 
-PUBLIC  fmt::fmt
-
-PRIVATE     
-                spdlog::spdlog 
-                nlohmann_json::nlohmann_json
+PUBLIC  fmt::fmt     
+        spdlog::spdlog 
+        nlohmann_json::nlohmann_json
 )
 
 
@@ -98,11 +96,6 @@ target_include_directories(${PROJECT_NAME}
         PRIVATE ${HEADER_DIR}/Logger/detail
 )
 
-
-target_compile_definitions(${PROJECT_NAME} 
-    PUBLIC  FMT_HEADER_ONLY=1
-            SPDLOG_FMT_EXTERNAL=1
-)
 
 
 #-------------------------------------
