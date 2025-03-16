@@ -78,7 +78,11 @@ LoggerImpl &LoggerImpl::GetInstance()
 }
 
 
-LoggerImpl::LoggerImpl() : data(std::make_unique<ImplData>()) {}
+LoggerImpl::LoggerImpl() : data(std::make_unique<ImplData>())
+{
+	data->logger = std::make_shared<spdlog::logger>("Logger", data->sinks.begin(), data->sinks.end());
+	spdlog::register_logger(data->logger);
+}
 
 
 void LoggerImpl::addConsoleOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, const std::string &pattern)
