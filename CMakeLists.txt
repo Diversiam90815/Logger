@@ -98,6 +98,7 @@ target_include_directories(${PROJECT_NAME}
         PRIVATE ${HEADER_DIR}/Logger/detail
 )
 
+
 target_compile_definitions(${PROJECT_NAME} 
     PUBLIC  FMT_HEADER_ONLY=1
             SPDLOG_FMT_EXTERNAL=1
