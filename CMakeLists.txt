@@ -85,7 +85,7 @@ add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
 
 target_link_libraries(${PROJECT_NAME} 
-PUBLIC fmt::fmt
+PUBLIC  fmt::fmt
 
 PRIVATE     
                 spdlog::spdlog 
@@ -99,28 +99,9 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_compile_definitions(${PROJECT_NAME} 
-    PUBLIC  FMT_HEADER_ONLY
-            SPDLOG_FMT_EXTERNAL
-           # SPDLOG_HEADER_ONLY
+    PUBLIC  FMT_HEADER_ONLY=1
+            SPDLOG_FMT_EXTERNAL=1
 )
-
-
-#-------------------------------------
-#       Create Example Executable
-#-------------------------------------
-
-option(BUILD_EXAMPLE "Build the logger example executable" ON)
-
-if(BUILD_EXAMPLE)
-    add_executable(LoggerExample ${Example_Files})
-    target_link_libraries(LoggerExample 
-        PRIVATE Logger
-                fmt::fmt                    
-    )
-    target_compile_definitions(LoggerExample PUBLIC FMT_HEADER_ONLY SPDLOG_FMT_EXTERNAL)
-
-
-endif()
 
 
 #-------------------------------------
