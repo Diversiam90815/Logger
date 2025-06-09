@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.2.71)
+set(LOGGER_VERSION 1.2.74)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
@@ -42,7 +42,7 @@ CPMAddPackage(
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
-    VERSION 3.11.2
+    VERSION 3.12.0
     SOURCE_DIR ${LIB_DIR}/nlohmann_json
 )
 
