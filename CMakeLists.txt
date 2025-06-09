@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.2.66)
+set(LOGGER_VERSION 1.2.71)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
@@ -35,6 +35,7 @@ CPMAddPackage(
     VERSION 8.1.1
     GIT_TAG 8.1.1
     GITHUB_REPOSITORY fmtlib/fmt
+    SOURCE_DIR ${LIB_DIR}/fmt
 )
 
 #       NLOHMANN JSON
@@ -92,8 +93,11 @@ PUBLIC  fmt::fmt
 
 
 target_include_directories(${PROJECT_NAME} 
-        PUBLIC  ${HEADER_DIR}/Logger
-        PRIVATE ${HEADER_DIR}/Logger/detail
+        PUBLIC  
+            ${HEADER_DIR}/Logger
+            ${LIB_DIR}/fmt/include 
+        PRIVATE 
+            ${HEADER_DIR}/Logger/detail
 )
 
 
