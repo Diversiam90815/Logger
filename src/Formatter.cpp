@@ -18,11 +18,6 @@ void Formatter::format(const spdlog::details::log_msg &msg, spdlog::memory_buf_t
 	auto  threadID	  = msg.thread_id;
 	auto  fileName	  = get_basename_no_ext(msg.source.filename);
 
-	if (msg.logger_name.size() != 0)
-	{
-		fileName.assign(msg.logger_name.data(), msg.logger_name.size());
-	}
-
 	auto		funcName = (msg.source.funcname ? msg.source.funcname : "");
 
 	std::string userMessage(msg.payload.begin(), msg.payload.end());
