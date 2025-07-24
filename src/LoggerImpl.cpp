@@ -96,6 +96,12 @@ void LoggerImpl::addConsoleOutput(LogLevel level, std::chrono::microseconds maxS
 		std::lock_guard<std::mutex> lock(data->mtx);
 		data->sinks.push_back(sink);
 		data->logger->sinks() = data->sinks;
+
+		auto spdLevel		  = toSpdLogLevel(level);
+		if (data->logger->level() > spdLevel)
+		{
+			data->logger->set_level(spdLevel);
+		}
 	}
 }
 
@@ -110,6 +116,12 @@ void LoggerImpl::addFileOutput(LogLevel level, std::chrono::microseconds maxSkip
 		std::lock_guard<std::mutex> lock(data->mtx);
 		data->sinks.push_back(sink);
 		data->logger->sinks() = data->sinks;
+
+		auto spdLevel		  = toSpdLogLevel(level);
+		if (data->logger->level() > spdLevel)
+		{
+			data->logger->set_level(spdLevel);
+		}
 	}
 }
 
@@ -125,6 +137,12 @@ void LoggerImpl::addMSVCOutput(LogLevel level, bool checkForDebuggerPresent, std
 		std::lock_guard<std::mutex> lock(data->mtx);
 		data->sinks.push_back(sink);
 		data->logger->sinks() = data->sinks;
+
+		auto spdLevel		  = toSpdLogLevel(level);
+		if (data->logger->level() > spdLevel)
+		{
+			data->logger->set_level(spdLevel);
+		}
 	}
 
 #endif
