@@ -49,7 +49,7 @@ void log(LogLevel level, const std::string &file, int line, const std::string &f
 
 // File Options:
 
-FileOptions &FileOptions::setFilename(std::string &filename)
+FileOptions &FileOptions::setFilename(const std::string &filename)
 {
 	this->filename = filename;
 	return *this;

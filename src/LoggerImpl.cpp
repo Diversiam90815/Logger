@@ -98,6 +98,9 @@ void LoggerImpl::addConsoleOutput(LogLevel level, std::chrono::microseconds maxS
 
 void LoggerImpl::addFileOutput(LogLevel level, std::chrono::microseconds maxSkipDuration, const std::string &fileName, size_t maxFileSize, size_t maxFiles, bool rotateOnSession)
 {
+	if (fileName.empty())
+		throw std::invalid_argument("File name cannot be empty");
+
 	auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(fileName, maxFileSize, maxFiles, rotateOnSession);
 	sink->set_level(toSpdLogLevel(level));
 	sink->set_formatter(std::make_unique<Formatter>());
@@ -195,6 +198,12 @@ void LoggerImpl::initializeLogger(const std::string &configFilePath)
 
 void LoggerImpl::log(LogLevel level, const std::string &file, int line, const std::string &function, const std::string &msg)
 {
+	if (!data->logger)
+	{
+		// If no logger is available, initialize a default console logger
+		addConsoleOutput(LogLevel::Info, std::chrono::microseconds(0), "[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+	}
+	
 	spdlog::source_loc loc{file.c_str(), line, function.c_str()}; // Create spdlog::source_loc object from provided data
 	auto			   spdLevel = toSpdLogLevel(level);			  // Convert LogLevel to spdlog Level
 	data->logger->log(loc, spdLevel, msg);						  // pass the source_loc along with msg and level

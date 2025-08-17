@@ -98,7 +98,7 @@ struct FileOptions : Options<FileOptions>
 	FileOptions(const FileOptions &other) = delete;
 	~FileOptions() { logging::addFileOutput(level, maxSkipDuration, filename, maxFileSize, maxFiles, rotateOnSession); }
 
-	FileOptions &setFilename(std::string &filename);
+	FileOptions &setFilename(const std::string &filename);
 	FileOptions &setMaxFileSize(size_t maxFileSize);
 	FileOptions &setMaxFiles(size_t maxFiles);
 	FileOptions &setRotateOnSession(bool rotateOnSession);
