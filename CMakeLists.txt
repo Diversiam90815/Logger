@@ -25,15 +25,15 @@ include(cmake/cpm.cmake)
 CPMAddPackage(
     NAME spdlog
     GITHUB_REPOSITORY gabime/spdlog
-    VERSION 1.15.0
+    VERSION 1.15.3
     SOURCE_DIR ${LIB_DIR}/spdlog
 )
 
 #       FMT
 CPMAddPackage(
     NAME fmt
-    VERSION 8.1.1
-    GIT_TAG 8.1.1
+    VERSION 11.2.0
+    GIT_TAG 11.2.0
     GITHUB_REPOSITORY fmtlib/fmt
     SOURCE_DIR ${LIB_DIR}/fmt
 )
