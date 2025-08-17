@@ -76,7 +76,7 @@ Alternatively, you can initialize the logger via a JSON configuration file. Crea
             "level": "info",
             "max_skip_duration": 0,
             "file_name": "logs/app.log",
-            "max_file_size": 10_MB,
+            "max_file_size": "10_MB",
             "max_files": 3,
             "rotate_on_session": true
         }

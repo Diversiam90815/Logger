@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.2.66)
+set(LOGGER_VERSION 1.2.74)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
@@ -35,13 +35,14 @@ CPMAddPackage(
     VERSION 8.1.1
     GIT_TAG 8.1.1
     GITHUB_REPOSITORY fmtlib/fmt
+    SOURCE_DIR ${LIB_DIR}/fmt
 )
 
 #       NLOHMANN JSON
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
-    VERSION 3.11.2
+    VERSION 3.12.0
     SOURCE_DIR ${LIB_DIR}/nlohmann_json
 )
 
@@ -85,24 +86,20 @@ add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
 
 target_link_libraries(${PROJECT_NAME} 
-PUBLIC  fmt::fmt
-
-PRIVATE     
-                spdlog::spdlog 
-                nlohmann_json::nlohmann_json
+PUBLIC  fmt::fmt     
+        spdlog::spdlog 
+        nlohmann_json::nlohmann_json
 )
 
 
 target_include_directories(${PROJECT_NAME} 
-        PUBLIC  ${HEADER_DIR}/Logger
-        PRIVATE ${HEADER_DIR}/Logger/detail
+        PUBLIC  
+            ${HEADER_DIR}/Logger
+            ${LIB_DIR}/fmt/include 
+        PRIVATE 
+            ${HEADER_DIR}/Logger/detail
 )
 
-
-target_compile_definitions(${PROJECT_NAME} 
-    PUBLIC  FMT_HEADER_ONLY=1
-            SPDLOG_FMT_EXTERNAL=1
-)
 
 
 #-------------------------------------
