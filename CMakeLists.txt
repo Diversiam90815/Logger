@@ -120,6 +120,28 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
 #-------------------------------------
+#       Install
+#-------------------------------------
+
+option(LOGGER_INSTALL "Install the Logger library and its public headers" ${PROJECT_IS_TOP_LEVEL})
+
+if(LOGGER_INSTALL)
+    install(TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
+
+    install(FILES
+        ${HEADER_DIR}/Logger/Logger.h
+        ${HEADER_DIR}/Logger/LoggerWrapper.h
+        ${HEADER_DIR}/Logger/PrintMacros.h
+        DESTINATION include/Logger
+    )
+endif()
+
+
+#-------------------------------------
 #       Static Analysis (optional)
 #-------------------------------------
 
