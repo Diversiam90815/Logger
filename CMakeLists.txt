@@ -13,6 +13,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ## Setting the lib directory for project included packages
 set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
+## Make the reusable cmake/ modules (cpm, Testing, Memcheck, CppCheck, ...) includable by bare name
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 ## Include the CPM (Package Manager used by CMake)
 include(cmake/cpm.cmake)
 
@@ -120,3 +123,28 @@ set(LOGGER_CONFIG_PATTERN "pattern" CACHE STRING "JSON key for log pattern")
 
 configure_file(LoggerJSONConfigNames.h.in LoggerJSONConfigNames.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+
+#-------------------------------------
+#       Static Analysis (optional)
+#-------------------------------------
+
+option(LOGGER_ENABLE_CPPCHECK "Enable cppcheck static analysis on the Logger target" OFF)
+
+if(LOGGER_ENABLE_CPPCHECK)
+    include(cmake/CppCheck.cmake)
+    AddCppCheck(${PROJECT_NAME})
+endif()
+
+
+#-------------------------------------
+#       Unit Tests
+#-------------------------------------
+
+option(LOGGER_BUILD_TESTS "Build Logger unit tests" ${PROJECT_IS_TOP_LEVEL})
+
+if(LOGGER_BUILD_TESTS)
+    enable_testing()
+    include(cmake/Testing.cmake)
+    add_subdirectory(Tests)
+endif()
