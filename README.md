@@ -1,5 +1,7 @@
 # Logger
 
+[![CI](https://github.com/Diversiam90815/Logger/actions/workflows/ci.yml/badge.svg)](https://github.com/Diversiam90815/Logger/actions/workflows/ci.yml)
+
 A simple C++ logging setup that builds on [spdlog](https://github.com/gabime/spdlog) to provide easily configurable console and file outputs, along with convenient logging macros.
 
 ## Features
