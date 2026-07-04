@@ -15,13 +15,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            platform: VS2022
+          - os: ubuntu-latest
+            platform: Ninja
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install Ninja (Linux)
         if: runner.os == 'Linux'
@@ -35,19 +46,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cpm-
 
-      - name: Configure (Windows)
-        if: runner.os == 'Windows'
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-
-      - name: Configure (Linux)
-        if: runner.os == 'Linux'
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build
-        run: cmake --build build --config Release
-
-      - name: Test
-        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Build and test (build.py)
+        run: python build.py --build -pl ${{ matrix.platform }} -c Release
 
   static-analysis:
     runs-on: ubuntu-latest
