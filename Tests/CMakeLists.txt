@@ -7,6 +7,6 @@ set(TEST_SOURCES
 
 add_executable(LoggerTests ${TEST_SOURCES})
 
-target_link_libraries(LoggerTests PRIVATE Logger)
+target_link_libraries(LoggerTests PRIVATE Logger spdlog::spdlog nlohmann_json::nlohmann_json)
 
 AddTests(LoggerTests)
