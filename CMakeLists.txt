@@ -20,6 +20,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 ## Include the CPM (Package Manager used by CMake)
 include(cmake/cpm.cmake)
 
+option(LOGGER_INSTALL "Install the Logger library, its public headers, and the private dependencies needed to link against it" ${PROJECT_IS_TOP_LEVEL})
+
 
 #-------------------------------------
 #       Thrid Library Packages
@@ -32,7 +34,7 @@ CPMAddPackage(
     VERSION 1.15.3
     SOURCE_DIR ${LIB_DIR}/spdlog
     OPTIONS
-        "SPDLOG_INSTALL OFF"
+        "SPDLOG_INSTALL ${LOGGER_INSTALL}"
 )
 
 #       NLOHMANN JSON
@@ -82,17 +84,19 @@ set(Example_Files
 #-------------------------------------
 
 add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 
 target_link_libraries(${PROJECT_NAME}
-PUBLIC  spdlog::spdlog
-        nlohmann_json::nlohmann_json
+PRIVATE spdlog::spdlog
+        $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>
 )
 
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
-            ${HEADER_DIR}/Logger
+            $<BUILD_INTERFACE:${HEADER_DIR}/Logger>
+            $<INSTALL_INTERFACE:include/Logger>
         PRIVATE
             ${HEADER_DIR}/Logger/detail
 )
@@ -123,10 +127,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #       Install
 #-------------------------------------
 
-option(LOGGER_INSTALL "Install the Logger library and its public headers" ${PROJECT_IS_TOP_LEVEL})
 
 if(LOGGER_INSTALL)
+    include(CMakePackageConfigHelpers)
+
     install(TARGETS ${PROJECT_NAME}
+        EXPORT LoggerTargets
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
@@ -137,6 +143,30 @@ if(LOGGER_INSTALL)
         ${HEADER_DIR}/Logger/LoggerWrapper.h
         ${HEADER_DIR}/Logger/PrintMacros.h
         DESTINATION include/Logger
+    )
+
+    install(EXPORT LoggerTargets
+        FILE LoggerTargets.cmake
+        NAMESPACE Logger::
+        DESTINATION lib/cmake/Logger
+    )
+
+    configure_package_config_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/LoggerConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfig.cmake
+        INSTALL_DESTINATION lib/cmake/Logger
+    )
+
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfigVersion.cmake
+        VERSION ${LOGGER_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfigVersion.cmake
+        DESTINATION lib/cmake/Logger
     )
 endif()
 
