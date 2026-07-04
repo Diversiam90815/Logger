@@ -17,9 +17,6 @@ Generated Files/
 __pycache__/
 .idea/
 
-# Performance analysis output directories
-performance_analysis_*
-
 # Visual Studio Files
 .vs/
 ALL BUILD.*
@@ -32,5 +29,3 @@ CMakeCache.txt
 # Excluding Cmake files
 **/CMakeFiles/*
 */CmakeCache.txt.prev
-
-
