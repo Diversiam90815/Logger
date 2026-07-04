@@ -31,15 +31,8 @@ CPMAddPackage(
     GITHUB_REPOSITORY gabime/spdlog
     VERSION 1.15.3
     SOURCE_DIR ${LIB_DIR}/spdlog
-)
-
-#       FMT
-CPMAddPackage(
-    NAME fmt
-    VERSION 11.2.0
-    GIT_TAG 11.2.0
-    GITHUB_REPOSITORY fmtlib/fmt
-    SOURCE_DIR ${LIB_DIR}/fmt
+    OPTIONS
+        "SPDLOG_INSTALL OFF"
 )
 
 #       NLOHMANN JSON
@@ -48,6 +41,8 @@ CPMAddPackage(
     GITHUB_REPOSITORY nlohmann/json
     VERSION 3.12.0
     SOURCE_DIR ${LIB_DIR}/nlohmann_json
+    OPTIONS
+        "JSON_Install OFF"
 )
 
 
@@ -89,18 +84,16 @@ set(Example_Files
 add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
 
 
-target_link_libraries(${PROJECT_NAME} 
-PUBLIC  fmt::fmt     
-        spdlog::spdlog 
+target_link_libraries(${PROJECT_NAME}
+PUBLIC  spdlog::spdlog
         nlohmann_json::nlohmann_json
 )
 
 
-target_include_directories(${PROJECT_NAME} 
-        PUBLIC  
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
             ${HEADER_DIR}/Logger
-            ${LIB_DIR}/fmt/include 
-        PRIVATE 
+        PRIVATE
             ${HEADER_DIR}/Logger/detail
 )
 

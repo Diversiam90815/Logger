@@ -7,6 +7,8 @@
 
 #include "Formatter.h"
 
+#include <format>
+
 
 Formatter::Formatter() {}
 
@@ -22,9 +24,13 @@ void Formatter::format(const spdlog::details::log_msg &msg, spdlog::memory_buf_t
 
 	std::string userMessage(msg.payload.begin(), msg.payload.end());
 
-	auto		formatted_line = fmt::format("{:<25.25} {:>8} {:<8.8} {:<20.20} {:<45.45} {}", timeString, threadID, levelString, fileName, funcName, userMessage);
+	// spdlog::level::to_string_view() returns spdlog's own (fmt-based) string_view type, which
+	// std::format has no formatter for - convert to std::string_view before passing it along.
+	std::string_view levelView(levelString.data(), levelString.size());
 
-	fmt::format_to(std::back_inserter(dest), "{}\n", formatted_line);
+	auto		formatted_line = std::format("{:<25.25} {:>8} {:<8.8} {:<20.20} {:<45.45} {}", timeString, threadID, levelView, fileName, funcName, userMessage);
+
+	std::format_to(std::back_inserter(dest), "{}\n", formatted_line);
 }
 
 
