@@ -1,6 +1,9 @@
 # Logger
 
-[![CI](https://github.com/Diversiam90815/Logger/actions/workflows/ci.yml/badge.svg)](https://github.com/Diversiam90815/Logger/actions/workflows/ci.yml)
+[![Windows](https://github.com/Diversiam90815/Logger/actions/workflows/windows.yml/badge.svg)](https://github.com/Diversiam90815/Logger/actions/workflows/windows.yml)
+[![Linux](https://github.com/Diversiam90815/Logger/actions/workflows/linux.yml/badge.svg)](https://github.com/Diversiam90815/Logger/actions/workflows/linux.yml)
+[![macOS](https://github.com/Diversiam90815/Logger/actions/workflows/macos.yml/badge.svg)](https://github.com/Diversiam90815/Logger/actions/workflows/macos.yml)
+[![Static Analysis](https://github.com/Diversiam90815/Logger/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/Diversiam90815/Logger/actions/workflows/static-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Overview
@@ -27,7 +30,7 @@ A lightweight C++20 logging library built on top of [spdlog](https://github.com/
 | Dependency Management | [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) |
 | Testing | GoogleTest 1.15.2 + CTest |
 | Static Analysis | CppCheck |
-| CI | GitHub Actions (build + test on Windows/Linux, cppcheck) |
+| CI | GitHub Actions (build + test on Windows/Linux/macOS, cppcheck) |
 
 ## Project Structure
 
