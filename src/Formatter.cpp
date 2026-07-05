@@ -7,6 +7,7 @@
 
 #include "Formatter.h"
 
+#include <ctime>
 #include <format>
 
 
@@ -60,11 +61,8 @@ std::string Formatter::format_time(const spdlog::log_clock::time_point &tp)
 	char dateTimeBuf[64];
 	std::strftime(dateTimeBuf, sizeof(dateTimeBuf), "%Y-%m-%d %H:%M:%S", &tm_local);
 
-	// Append milliseconds
-	// e.g. "2024-12-23 13:13:55.123"
-	std::ostringstream oss;
-	oss << dateTimeBuf << '.' << std::setw(3) << std::setfill('0') << ms.count();
-	return oss.str();
+	// Append milliseconds, e.g. "2024-12-23 13:13:55.123"
+	return std::format("{}.{:03}", dateTimeBuf, ms.count());
 }
 
 
