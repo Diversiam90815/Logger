@@ -1,0 +1,36 @@
+name: Static Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/.cpm_cache
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck and Ninja
+        run: sudo apt-get update && sudo apt-get install -y cppcheck ninja-build
+
+      - name: Cache CPM packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CPM_SOURCE_CACHE }}
+          key: ${{ runner.os }}-cpm-${{ hashFiles('CMakeLists.txt', 'cmake/Testing.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-cpm-
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLOGGER_BUILD_TESTS=OFF -DLOGGER_ENABLE_CPPCHECK=ON
+
+      - name: Build with cppcheck
+        run: cmake --build build --target Logger
