@@ -15,11 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: windows-latest
-            platform: VS2022
-          - os: ubuntu-latest
-            platform: Ninja
+        os: [windows-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -38,6 +34,14 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ninja-build
 
+      - name: Install Ninja (Windows)
+        if: runner.os == 'Windows'
+        uses: seanmiddleditch/gha-setup-ninja@v4
+
+      - name: Set up MSVC dev environment (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Cache CPM packages
         uses: actions/cache@v4
         with:
@@ -47,7 +51,7 @@ jobs:
             ${{ runner.os }}-cpm-
 
       - name: Build and test (build.py)
-        run: python build.py --build -pl ${{ matrix.platform }} -c Release
+        run: python build.py --build -pl Ninja -c Release
 
   static-analysis:
     runs-on: ubuntu-latest
