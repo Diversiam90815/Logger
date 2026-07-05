@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(LOGGER_VERSION 1.3.81)
+set(LOGGER_VERSION 1.3.86)
+set(BUILD_ENVIRONMENT ENV_DEVELOPMENT)
 
 project(Logger LANGUAGES CXX VERSION ${LOGGER_VERSION})
 
@@ -13,8 +14,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ## Setting the lib directory for project included packages
 set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
+## Make the reusable cmake/ modules (cpm, Testing, Memcheck, CppCheck, ...) includable by bare name
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 ## Include the CPM (Package Manager used by CMake)
 include(cmake/cpm.cmake)
+
+option(LOGGER_INSTALL "Install the Logger library, its public headers, and the private dependencies needed to link against it" ${PROJECT_IS_TOP_LEVEL})
 
 
 #-------------------------------------
@@ -27,15 +33,8 @@ CPMAddPackage(
     GITHUB_REPOSITORY gabime/spdlog
     VERSION 1.15.3
     SOURCE_DIR ${LIB_DIR}/spdlog
-)
-
-#       FMT
-CPMAddPackage(
-    NAME fmt
-    VERSION 11.2.0
-    GIT_TAG 11.2.0
-    GITHUB_REPOSITORY fmtlib/fmt
-    SOURCE_DIR ${LIB_DIR}/fmt
+    OPTIONS
+        "SPDLOG_INSTALL ${LOGGER_INSTALL}"
 )
 
 #       NLOHMANN JSON
@@ -44,6 +43,8 @@ CPMAddPackage(
     GITHUB_REPOSITORY nlohmann/json
     VERSION 3.12.0
     SOURCE_DIR ${LIB_DIR}/nlohmann_json
+    OPTIONS
+        "JSON_Install OFF"
 )
 
 
@@ -83,20 +84,20 @@ set(Example_Files
 #-------------------------------------
 
 add_library(${PROJECT_NAME} STATIC ${Source_Files} ${Header_Files})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 
-target_link_libraries(${PROJECT_NAME} 
-PUBLIC  fmt::fmt     
-        spdlog::spdlog 
-        nlohmann_json::nlohmann_json
+target_link_libraries(${PROJECT_NAME}
+PRIVATE spdlog::spdlog
+        $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>
 )
 
 
-target_include_directories(${PROJECT_NAME} 
-        PUBLIC  
-            ${HEADER_DIR}/Logger
-            ${LIB_DIR}/fmt/include 
-        PRIVATE 
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
+            $<BUILD_INTERFACE:${HEADER_DIR}/Logger>
+            $<INSTALL_INTERFACE:include/Logger>
+        PRIVATE
             ${HEADER_DIR}/Logger/detail
 )
 
@@ -120,3 +121,76 @@ set(LOGGER_CONFIG_PATTERN "pattern" CACHE STRING "JSON key for log pattern")
 
 configure_file(LoggerJSONConfigNames.h.in LoggerJSONConfigNames.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+
+#-------------------------------------
+#       Install
+#-------------------------------------
+
+
+if(LOGGER_INSTALL)
+    include(CMakePackageConfigHelpers)
+
+    install(TARGETS ${PROJECT_NAME}
+        EXPORT LoggerTargets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
+
+    install(FILES
+        ${HEADER_DIR}/Logger/Logger.h
+        ${HEADER_DIR}/Logger/LoggerWrapper.h
+        ${HEADER_DIR}/Logger/PrintMacros.h
+        DESTINATION include/Logger
+    )
+
+    install(EXPORT LoggerTargets
+        FILE LoggerTargets.cmake
+        NAMESPACE Logger::
+        DESTINATION lib/cmake/Logger
+    )
+
+    configure_package_config_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/LoggerConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfig.cmake
+        INSTALL_DESTINATION lib/cmake/Logger
+    )
+
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfigVersion.cmake
+        VERSION ${LOGGER_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/LoggerConfigVersion.cmake
+        DESTINATION lib/cmake/Logger
+    )
+endif()
+
+
+#-------------------------------------
+#       Static Analysis (optional)
+#-------------------------------------
+
+option(LOGGER_ENABLE_CPPCHECK "Enable cppcheck static analysis on the Logger target" OFF)
+
+if(LOGGER_ENABLE_CPPCHECK)
+    include(cmake/CppCheck.cmake)
+    AddCppCheck(${PROJECT_NAME})
+endif()
+
+
+#-------------------------------------
+#       Unit Tests
+#-------------------------------------
+
+option(LOGGER_BUILD_TESTS "Build Logger unit tests" ${PROJECT_IS_TOP_LEVEL})
+
+if(LOGGER_BUILD_TESTS)
+    enable_testing()
+    include(cmake/Testing.cmake)
+    add_subdirectory(Tests)
+endif()
